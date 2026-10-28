@@ -8,6 +8,9 @@ people ask and in dental records. Served by GitHub Pages at https://healthtransf
 - `perio-bench/`, `oral-health-bench/`: the two pitch decks, copied from `docs/edr/deck.html` and
   `docs/pitch/deck.html` in that repo. Edit the slides there, rebuild with `python docs/build_decks.py`, and copy the
   built `deck.html` here.
+- `favicon.svg`, `favicon.ico`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `site.webmanifest`: the site
+  icon, the nav bar's mark (a Libre Baskerville Bold "H", `#0F2A33` on `#F2A070`). The SVG draws the letter as a
+  path, so it needs no font; the PNGs and the ICO are rendered from it.
 - `CNAME`: the custom domain. DNS is on Cloudflare (four A records for `@` to GitHub Pages, `www` CNAME to
   `healthtransformationlab.github.io`, all DNS only).
 
