@@ -136,7 +136,7 @@ footer p{max-width:60em;margin-bottom:10px}
 <header id="top">
   <div class="wrap">
 <div class="hero">
-      <span class="tag">Working name · a personal project</span>
+      <span class="tag">A personal project</span>
       <h1>Better health starts with <span>accurate health information.</span></h1>
       <p class="lead">Millions of people ask AI from OpenAI, Anthropic and Google about their health, and clinics run on what is written in the record. The lab measures how accurate that information is, in AI answers and in dental records, and publishes open benchmarks so it gets fixed and health outcomes improve.</p>
       <div class="stats">
@@ -153,7 +153,7 @@ footer p{max-width:60em;margin-bottom:10px}
   <div class="wrap">
     <p class="kicker">Why benchmarks</p>
     <h2>What a benchmark tests is what gets fixed.</h2>
-    <p>AI companies are graded on public benchmarks and compete to raise their scores. Benchmarks today test exam knowledge, not whether an answer connects the mouth to the rest of the body, or whether it helps someone actually get care. Dental records have the same gap: the diagnosis is written down, in pieces, and nobody checks whether the pieces agree.</p>
+    <p>AI companies are graded on public benchmarks and compete to raise their scores. Most benchmarks test exam knowledge, and studies of real patient cases have found AI falling short on questions such as drug interactions. Dental records have the same gap: the diagnosis is written down, in pieces, and nobody checks whether the pieces agree.</p>
     <div class="why">
       <div class="card reveal"><h3>Accurate AI answers</h3><p>Score the AI that millions of people ask on the questions that matter at the seam of medical and dental care: medicines, chronic disease, emergencies.</p></div>
       <div class="card reveal"><h3>Trustworthy records</h3><p>Measure the data quality of electronic dental records, so a diagnosis can be counted, followed over time and linked to diabetes care.</p></div>
@@ -191,7 +191,7 @@ footer p{max-width:60em;margin-bottom:10px}
       <p class="kicker">Benchmark 2 · AI answers</p>
       <h2>OralHealthBench</h2>
       <p class="quote">AI passes the dental exam. It fails the real patient.</p>
-      <p>Twelve leading AI models average 81% on the dental licensing exam but 22% on real patient cases (GlobalDentBench, 2026). No public test we found checks whether they connect the mouth to the rest of the body: a medicine that makes a tooth extraction unsafe, or gum disease and diabetes. OralHealthBench puts those questions, each traced to published evidence, on a public scorecard, and measures how much an open evidence agent improves the answers.</p>
+      <p>Twelve leading AI models average 81% on the dental licensing exam but 22% on real patient cases (GlobalDentBench, 2026). Most benchmarks test exam knowledge, and studies of real patient cases have found the same gap: on real hospital cases, models followed neither diagnostic nor treatment guidelines (<a href="https://doi.org/10.1038/s41591-024-03097-1" target="_blank" rel="noopener">Hager et al., 2024</a>); people using them did no better than people using a source of their choice (<a href="https://doi.org/10.1038/s41591-025-04074-y" target="_blank" rel="noopener">Bean et al., 2026</a>); and against a standard drug-interaction checker, ChatGPT-3.5 got 47% of 255 drug pairs right (<a href="https://doi.org/10.2147/DHPS.S425858" target="_blank" rel="noopener">Al-Ashwal et al., 2023</a>). OralHealthBench puts real-world questions where dentistry meets medicine on a public scorecard, such as a medicine that makes a tooth extraction unsafe, each traced to published evidence, and measures how much an open evidence agent improves the answers.</p>
       <p style="margin-top:14px">Its companion, <b>AccessBench</b>, asks whether an answer works for someone with no coverage, no car or no dentist nearby.</p>
       <div class="buttons">
         <a class="btn primary" href="oral-health-bench/" target="_blank" rel="noopener">View the pitch</a>
@@ -206,8 +206,8 @@ footer p{max-width:60em;margin-bottom:10px}
 <section id="how" class="alt">
   <div class="wrap">
     <p class="kicker">How the two connect</p>
-    <h2>One harness, from gum charts to the questions people ask.</h2>
-    <p>The dental record path builds synthetic patients whose right answers are known, in OMOP, the data format medicine already uses. Those patients become test questions for the lab. The same models, runners, harm grades and leaderboards score AI on each step.</p>
+    <h2>One way to test AI, from gum charts to the questions people ask.</h2>
+    <p>The dental record path builds synthetic patients whose right answers are known, in OMOP, the data format medicine already uses. Those patients become test questions for the lab. AI is tested the same way at every step, with the same models, harm grades and leaderboards.</p>
     <div class="flow">
       <div class="card reveal"><h3>Synthetic patients</h3><p>Records with known right answers, in OMOP. No real patient data, ever.</p></div>
       <div class="card reveal"><h3>Gum charts</h3><p>PerioBench: can rules and AI read the whole dental record accurately?</p></div>
@@ -230,7 +230,7 @@ footer p{max-width:60em;margin-bottom:10px}
 
 <footer>
   <div class="wrap">
-    <p><b>Personal learning project.</b> Built on my own time. "Health Transformation Lab" is a working name for a personal idea: not affiliated with or endorsed by any employer, institution or vendor, and nothing here is any organization's plan, study or finding. Companies are named only as their public sources describe them. Synthetic data only. See the <a href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">disclaimer</a>.</p>
+    <p><b>Personal learning project.</b> Built on my own time: not affiliated with or endorsed by any employer, institution or vendor, and nothing here is any organization's plan, study or finding. Companies are named only as their public sources describe them. Synthetic data only. See the <a href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">disclaimer</a>.</p>
     <p>John Bowyer · <a href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/LICENSE" target="_blank" rel="noopener">MIT licence</a></p>
   </div>
 </footer>
