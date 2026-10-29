@@ -14,5 +14,5 @@ people ask and in dental records. Served by GitHub Pages at https://healthtransf
 - `CNAME`: the custom domain. DNS is on Cloudflare (four A records for `@` to GitHub Pages, `www` CNAME to
   `healthtransformationlab.github.io`, all DNS only).
 
-Personal learning project, not affiliated with or endorsed by any employer, institution or vendor. Synthetic data
-only.
+Personal learning project, not affiliated with or endorsed by any employer, institution or vendor. The patients
+are synthetic.
