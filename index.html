@@ -138,7 +138,7 @@ footer p{max-width:60em;margin-bottom:10px}
 <div class="hero">
       <span class="tag">A personal project</span>
       <h1>Better health starts with <span>accurate health information.</span></h1>
-      <p class="lead">Millions of people ask AI from OpenAI, Anthropic and Google about their health, and clinics run on what is written in the record. <b>OralHealthBench</b> measures how accurate those AI answers are on oral health and getting care. <b>PerioBench</b> measures how well gum disease can be found in dental records. Both are open, so what they find gets fixed and health outcomes improve.</p>
+      <p class="lead">Millions of people ask AI from OpenAI, Anthropic and Google about their health, and clinics run on what is written in the record. <b>PerioBench</b>, working today on synthetic records, measures how well gum disease can be found in dental records. <b>OralHealthBench</b>, planned and building on GlobalDentBench, will measure how accurate those AI answers are on oral health and getting care. Both are open, so what they find gets fixed and health outcomes improve.</p>
       <div class="stats">
         <div class="stat"><b>40M+</b><span>people a day ask one AI assistant about health</span><small>OpenAI, January 2026</small></div>
         <div class="stat"><b>81% → 22%</b><span>AI's score on dental exam questions vs. questions from published patient cases</span><small>12 models · GlobalDentBench, 2026</small></div>
@@ -155,7 +155,7 @@ footer p{max-width:60em;margin-bottom:10px}
     <h2>What a benchmark tests is what gets fixed.</h2>
     <p>AI companies are graded on public benchmarks and compete to raise their scores. Most benchmarks test exam knowledge, and studies of real patient cases have found AI falling short on questions such as drug interactions. Dental records have the same gap: gum disease is written down in pieces, and the pieces often disagree.</p>
     <div class="why">
-      <div class="card reveal"><h3>OralHealthBench: accurate AI answers</h3><p>Score the AI that millions of people ask on the questions that matter at the seam of medical and dental care: medicines, chronic disease, emergencies.</p></div>
+      <div class="card reveal"><h3>OralHealthBench (planned): accurate AI answers</h3><p>Score the AI that millions of people ask on the questions that matter at the seam of medical and dental care: medicines, chronic disease, emergencies.</p></div>
       <div class="card reveal"><h3>PerioBench: trustworthy records</h3><p>Measure the data quality of electronic dental records, so gum disease can be counted, followed over time and linked to diabetes care.</p></div>
       <div class="card reveal"><h3>Open and public</h3><p>Questions trace to published evidence, scores are public, and the code, the synthetic data and the methods are open for anyone to check.</p></div>
     </div>
@@ -165,7 +165,7 @@ footer p{max-width:60em;margin-bottom:10px}
 <section id="periobench" class="alt">
   <div class="wrap bench reveal">
     <div>
-      <p class="kicker">Benchmark 1 · dental records</p>
+      <p class="kicker">Benchmark 1 · dental records · working on synthetic data</p>
       <h2>PerioBench</h2>
       <p class="quote">Gum disease is in the dental record. Nobody can count it.</p>
       <p>Gum disease (periodontitis) is written down at almost every dental visit, but in pieces: notes, forms, codes and measurements that often disagree. So it is missed, can't be followed over time, and can't be linked to diabetes care. PerioBench scores how accurately rules and AI find it in the whole record. It runs end to end on <b>synthetic</b> records:</p>
@@ -188,11 +188,11 @@ footer p{max-width:60em;margin-bottom:10px}
 <section id="oralhealthbench">
   <div class="wrap bench reveal">
     <div>
-      <p class="kicker">Benchmark 2 · AI answers</p>
+      <p class="kicker">Benchmark 2 · AI answers · planned</p>
       <h2>OralHealthBench</h2>
       <p class="quote">AI passes the dental exam. It fails the real patient.</p>
-      <p>Twelve leading AI models average 81% on dental licensing-exam questions but 22% on questions built from published patient cases (GlobalDentBench, 2026). Most benchmarks test exam knowledge, and studies of real patient cases have found the same gap: on real hospital cases, models didn't follow the clinical guidelines doctors use (<a href="https://doi.org/10.1038/s41591-024-03097-1" target="_blank" rel="noopener">Hager et al., 2024</a>); people using them did no better than people using a source of their choice (<a href="https://doi.org/10.1038/s41591-025-04074-y" target="_blank" rel="noopener">Bean et al., 2026</a>); and against a standard drug-interaction checker, ChatGPT-3.5 got 47% of 255 drug pairs right (<a href="https://doi.org/10.2147/DHPS.S425858" target="_blank" rel="noopener">Al-Ashwal et al., 2023</a>). OralHealthBench puts real-world questions where dentistry meets medicine on a public scorecard, such as a medicine that makes a tooth extraction unsafe, each traced to published evidence, and measures how much an open evidence agent improves the answers.</p>
-      <p style="margin-top:14px">Its companion, <b>AccessBench</b>, asks whether an answer works for someone with no coverage, no car or no dentist nearby.</p>
+      <p>Twelve leading AI models average 81% on dental licensing-exam questions but 22% on questions built from published patient cases (GlobalDentBench, 2026). Most benchmarks test exam knowledge, and studies of real patient cases have found the same gap: on real hospital cases, models didn't follow the clinical guidelines doctors use (<a href="https://doi.org/10.1038/s41591-024-03097-1" target="_blank" rel="noopener">Hager et al., 2024</a>); people using them did no better than people using a source of their choice (<a href="https://doi.org/10.1038/s41591-025-04074-y" target="_blank" rel="noopener">Bean et al., 2026</a>); and against a standard drug-interaction checker, ChatGPT-3.5 got 47% of 255 drug pairs right (<a href="https://doi.org/10.2147/DHPS.S425858" target="_blank" rel="noopener">Al-Ashwal et al., 2023</a>). OralHealthBench, planned and building on GlobalDentBench, will put real-world questions where dentistry meets medicine on a public scorecard, such as a medicine that makes a tooth extraction unsafe, each traced to published evidence, and will measure how much an open evidence agent improves the answers.</p>
+      <p style="margin-top:14px">A third idea, <b>AccessBench</b>, is exploratory: it would ask whether an answer works for someone with no coverage, no car or no dentist nearby.</p>
       <div class="buttons">
         <a class="btn primary" href="oral-health-bench/" target="_blank" rel="noopener">View the pitch</a>
         <a class="btn" href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/docs/pitch/full_text_and_notes.md" target="_blank" rel="noopener">Read with speaker notes</a>
