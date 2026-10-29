@@ -153,10 +153,10 @@ footer p{max-width:60em;margin-bottom:10px}
   <div class="wrap">
     <p class="kicker">Why benchmarks</p>
     <h2>What a benchmark tests is what gets fixed.</h2>
-    <p>AI companies are graded on public benchmarks and compete to raise their scores. Most benchmarks test exam knowledge, and studies of real patient cases have found AI falling short on questions such as drug interactions. Dental records have the same gap: the diagnosis is written down, in pieces, and nobody checks whether the pieces agree.</p>
+    <p>AI companies are graded on public benchmarks and compete to raise their scores. Most benchmarks test exam knowledge, and studies of real patient cases have found AI falling short on questions such as drug interactions. Dental records have the same gap: gum disease is written down in pieces, and the pieces often disagree.</p>
     <div class="why">
       <div class="card reveal"><h3>Accurate AI answers</h3><p>Score the AI that millions of people ask on the questions that matter at the seam of medical and dental care: medicines, chronic disease, emergencies.</p></div>
-      <div class="card reveal"><h3>Trustworthy records</h3><p>Measure the data quality of electronic dental records, so a diagnosis can be counted, followed over time and linked to diabetes care.</p></div>
+      <div class="card reveal"><h3>Trustworthy records</h3><p>Measure the data quality of electronic dental records, so gum disease can be counted, followed over time and linked to diabetes care.</p></div>
       <div class="card reveal"><h3>Open and public</h3><p>Questions trace to published evidence, scores are public, and the code, the synthetic data and the methods are open for anyone to check.</p></div>
     </div>
   </div>
@@ -167,8 +167,8 @@ footer p{max-width:60em;margin-bottom:10px}
     <div>
       <p class="kicker">Benchmark 1 · dental records</p>
       <h2>PerioBench</h2>
-      <p class="quote">The diagnosis is in the dental record. Nobody can count it.</p>
-      <p>Gum disease (periodontitis) is written down at almost every dental visit, but in pieces: notes, forms, codes and measurements that often disagree. So it is missed, can't be followed over time, and can't be linked to diabetes care. PerioBench scores how accurately rules and AI diagnose it from the whole record. It runs end to end on <b>synthetic</b> records:</p>
+      <p class="quote">Gum disease is in the dental record. Nobody can count it.</p>
+      <p>Gum disease (periodontitis) is written down at almost every dental visit, but in pieces: notes, forms, codes and measurements that often disagree. So it is missed, can't be followed over time, and can't be linked to diabetes care. PerioBench scores how accurately rules and AI find it in the whole record. It runs end to end on <b>synthetic</b> records:</p>
       <ul>
         <li>the whole record, combined by rules that read the gum measurements first: <b>234 of 240</b> charts right;</li>
         <li>the free-text note alone, read by a small trained model: <b>219 of 240</b>;</li>
@@ -181,7 +181,7 @@ footer p{max-width:60em;margin-bottom:10px}
         <a class="btn" href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/docs/edr/README.md" target="_blank" rel="noopener">The study</a>
       </div>
     </div>
-    <a href="perio-bench/" target="_blank" rel="noopener"><img src="img/edr_deck_cover.png" alt="PerioBench pitch cover: The diagnosis is in the dental record. Nobody can count it." width="960" height="540"></a>
+    <a href="perio-bench/" target="_blank" rel="noopener"><img src="img/edr_deck_cover.png" alt="PerioBench pitch cover: Gum disease is in the dental record. Nobody can count it." width="960" height="540"></a>
   </div>
 </section>
 
@@ -191,7 +191,7 @@ footer p{max-width:60em;margin-bottom:10px}
       <p class="kicker">Benchmark 2 · AI answers</p>
       <h2>OralHealthBench</h2>
       <p class="quote">AI passes the dental exam. It fails the real patient.</p>
-      <p>Twelve leading AI models average 81% on the dental licensing exam but 22% on real patient cases (GlobalDentBench, 2026). Most benchmarks test exam knowledge, and studies of real patient cases have found the same gap: on real hospital cases, models followed neither diagnostic nor treatment guidelines (<a href="https://doi.org/10.1038/s41591-024-03097-1" target="_blank" rel="noopener">Hager et al., 2024</a>); people using them did no better than people using a source of their choice (<a href="https://doi.org/10.1038/s41591-025-04074-y" target="_blank" rel="noopener">Bean et al., 2026</a>); and against a standard drug-interaction checker, ChatGPT-3.5 got 47% of 255 drug pairs right (<a href="https://doi.org/10.2147/DHPS.S425858" target="_blank" rel="noopener">Al-Ashwal et al., 2023</a>). OralHealthBench puts real-world questions where dentistry meets medicine on a public scorecard, such as a medicine that makes a tooth extraction unsafe, each traced to published evidence, and measures how much an open evidence agent improves the answers.</p>
+      <p>Twelve leading AI models average 81% on the dental licensing exam but 22% on real patient cases (GlobalDentBench, 2026). Most benchmarks test exam knowledge, and studies of real patient cases have found the same gap: on real hospital cases, models didn't follow the clinical guidelines doctors use (<a href="https://doi.org/10.1038/s41591-024-03097-1" target="_blank" rel="noopener">Hager et al., 2024</a>); people using them did no better than people using a source of their choice (<a href="https://doi.org/10.1038/s41591-025-04074-y" target="_blank" rel="noopener">Bean et al., 2026</a>); and against a standard drug-interaction checker, ChatGPT-3.5 got 47% of 255 drug pairs right (<a href="https://doi.org/10.2147/DHPS.S425858" target="_blank" rel="noopener">Al-Ashwal et al., 2023</a>). OralHealthBench puts real-world questions where dentistry meets medicine on a public scorecard, such as a medicine that makes a tooth extraction unsafe, each traced to published evidence, and measures how much an open evidence agent improves the answers.</p>
       <p style="margin-top:14px">Its companion, <b>AccessBench</b>, asks whether an answer works for someone with no coverage, no car or no dentist nearby.</p>
       <div class="buttons">
         <a class="btn primary" href="oral-health-bench/" target="_blank" rel="noopener">View the pitch</a>
@@ -209,13 +209,13 @@ footer p{max-width:60em;margin-bottom:10px}
     <h2>One way to test AI, from gum charts to the questions people ask.</h2>
     <p>The dental record path builds synthetic patients whose right answers are known, in OMOP, the data format medicine already uses. Those patients become test questions for the lab. AI is tested the same way at every step, with the same models, harm grades and leaderboards.</p>
     <div class="flow">
-      <div class="card reveal"><h3>Synthetic patients</h3><p>Records with known right answers, in OMOP. No real patient data, ever.</p></div>
+      <div class="card reveal"><h3>Synthetic patients</h3><p>Made-up patients in OMOP, so every right answer is known.</p></div>
       <div class="card reveal"><h3>Gum charts</h3><p>PerioBench: can rules and AI read the whole dental record accurately?</p></div>
       <div class="card reveal"><h3>Case questions</h3><p>The same patients become questions, scored for accuracy and harm.</p></div>
       <div class="card reveal"><h3>Medical-dental questions</h3><p>OralHealthBench and AccessBench: the questions people actually ask.</p></div>
     </div>
     <div class="principles">
-      <div><b>Synthetic data only</b>Never real patient data or PHI.</div>
+      <div><b>Synthetic patients</b>No identifiable patient data (PHI). Published, de-identified datasets are used only to test tools.</div>
       <div><b>Simulated is labelled</b>No dry-run number is presented as a result.</div>
       <div><b>Reproducible</b>Python and R give the same numbers, and the code is open.</div>
       <div><b>Cited</b>Every figure names its public source.</div>
@@ -230,7 +230,7 @@ footer p{max-width:60em;margin-bottom:10px}
 
 <footer>
   <div class="wrap">
-    <p><b>Personal learning project.</b> Built on my own time: not affiliated with or endorsed by any employer, institution or vendor, and nothing here is any organization's plan, study or finding. Companies are named only as their public sources describe them. Synthetic data only. See the <a href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">disclaimer</a>.</p>
+    <p><b>Personal learning project.</b> Built on my own time: not affiliated with or endorsed by any employer, institution or vendor, and nothing here is any organization's plan, study or finding. Companies are named only as their public sources describe them. The patients are synthetic. See the <a href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">disclaimer</a>.</p>
     <p>John Bowyer · <a href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/LICENSE" target="_blank" rel="noopener">MIT licence</a></p>
   </div>
 </footer>
