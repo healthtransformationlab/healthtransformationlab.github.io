@@ -93,7 +93,7 @@ details{margin:8px 0} summary{cursor:pointer;color:var(--accent)}
     <h2>How messy the perio charts are</h2>
     <p>In the synthetic Open Dental extract (2,000 patients), measured the same way a real extract would be. Counts only.</p>
     <div class="bars" id="mess"></div>
-    <p>Method and code: <a href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/python/health_transformation_lab_nlp/dq_site.py">dq_site.py</a> builds <a href="data.json">data.json</a> from the project's committed results; this page only reads it. How scores work: <a href="../scoring/">scoring</a>.</p>
+    <p>Method and code: <a href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/python/health_transformation_lab_nlp/dq_site.py">dq_site.py</a> builds <a href="https://raw.githubusercontent.com/healthtransformationlab/health-transformation-lab-nlp/main/docs/site/data-quality.json">data-quality.json</a> in the project repo from its committed results; this page reads that file directly, so it updates when the repo does. How scores work: <a href="../scoring/">scoring</a>.</p>
   </section>
 </main>
 <div id="tip" role="tooltip"></div>
@@ -122,7 +122,8 @@ details{margin:8px 0} summary{cursor:pointer;color:var(--accent)}
       box.appendChild(row);
     });
   }
-  fetch('data.json').then(function(r){return r.json();}).then(function(d){
+  var SRC='https://raw.githubusercontent.com/healthtransformationlab/health-transformation-lab-nlp/main/docs/site/data-quality.json';
+  fetch(SRC).then(function(r){return r.json();}).then(function(d){
     document.getElementById('note').textContent=d.note;
     var pass=d.checks.filter(function(c){return c.status==='PASS';});
     var passing=pass.filter(function(c){return c.n_fail===0;}).length;
@@ -146,7 +147,7 @@ details{margin:8px 0} summary{cursor:pointer;color:var(--accent)}
     bars('resolved',tm.slice().sort(function(a,b){return b.perio_resolved_pct-a.perio_resolved_pct;}).map(function(m){return {label:m.label,v:m.perio_resolved_pct,detail:'of '+m.n_later_visits.toLocaleString()+' later visits'};}));
     document.getElementById('injected').textContent='Planted errors: the generator added '+d.injected.injected_count+' charting mistakes on purpose. The over-time checks catch '+d.injected.caught_count+' of them ('+fmt(d.injected.caught_pct)+'), and flag '+fmt(d.injected.false_flag_pct)+' of visits that had no planted mistake.';
     bars('mess',d.open_dental.map(function(r){return {label:r.label,v:r.pct,detail:r.numerator.toLocaleString()+' of '+r.denominator.toLocaleString()};}),100);
-  }).catch(function(){document.getElementById('note').textContent='The data could not be loaded. Open data.json directly to see it.';});
+  }).catch(function(){document.getElementById('note').textContent='The data could not be loaded. Open the data file directly: '+SRC;});
 })();
 </script>
 <footer>

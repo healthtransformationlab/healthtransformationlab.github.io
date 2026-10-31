@@ -14,9 +14,9 @@ people ask and in dental records. Served by GitHub Pages at https://healthtransf
 - `standards/`: the short form of
   [docs/standards.md](https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/docs/standards.md)
   (definitions, sources and reading orders side by side). Its numbers are copied from that page: update both together.
-- `data-quality/`: a static data-quality page. `data.json` is a copy of `docs/site/data-quality.json` from the project
-  repo (made by `python scripts/50_dq_site.py`); the page only reads it, with no server or API. Copy it again when
-  it changes.
+- `data-quality/`: a static data-quality page. It reads `docs/site/data-quality.json` straight from the project repo's
+  `main` (raw.githubusercontent.com, cached 5 minutes), made there by `python scripts/50_dq_site.py`. No copy, no
+  server, no API: it updates when that file does.
 - `favicon.svg`, `favicon.ico`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `site.webmanifest`: the site
   icon, the nav bar's mark (a Libre Baskerville Bold "H", `#0F2A33` on `#F2A070`). The SVG draws the letter as a
   path, so it needs no font; the PNGs and the ICO are rendered from it.
