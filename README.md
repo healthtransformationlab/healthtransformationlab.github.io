@@ -8,6 +8,9 @@ people ask and in dental records. Served by GitHub Pages at https://healthtransf
 - `perio-bench/`, `oral-health-bench/`: the two pitch decks, copied from `docs/edr/deck.html` and
   `docs/pitch/deck.html` in that repo. Edit the slides there, rebuild with `python docs/build_decks.py`, and copy the
   built `deck.html` here.
+- `scoring/`: how PerioBench scores work, the short form of
+  [docs/scoring.md](https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/docs/scoring.md)
+  in that repo (spec 030). Edit both together.
 - `favicon.svg`, `favicon.ico`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `site.webmanifest`: the site
   icon, the nav bar's mark (a Libre Baskerville Bold "H", `#0F2A33` on `#F2A070`). The SVG draws the letter as a
   path, so it needs no font; the PNGs and the ICO are rendered from it.
