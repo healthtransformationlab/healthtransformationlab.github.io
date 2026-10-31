@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Data quality · Health Transformation Lab</title>
+<title>EHR DQ grader · Health Transformation Lab</title>
 <link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><meta name="theme-color" content="#0F2A33">
-<meta name="description" content="What data-quality checks find in a synthetic dental record: what is missing, what goes backwards over time, and how messy perio charts are. Synthetic data.">
+<meta name="description" content="Is this dental record fit for finding gum disease? Completeness, accuracy, consistency, temporal plausibility and reliability, on synthetic records.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Public+Sans:wght@400..700&display=swap" rel="stylesheet">
@@ -38,7 +38,7 @@ th{font-weight:700}
 .viz{--series-1:#2a78d6;--grid:#e1e0d9;--muted:#5C6F75;--good:#0ca30c;--warning:#b77900}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0}
 .tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.tile b{display:block;font-size:30px;line-height:1.1;color:var(--ink)}
+.tile b{display:block;font-size:28px;line-height:1.1;color:var(--ink)}
 .tile span{font-size:14px;color:var(--muted)}
 .bars{display:grid;gap:6px;margin:12px 0}
 .bar-row{display:grid;grid-template-columns:minmax(0,44%) 1fr;gap:10px;align-items:center;font-size:15px}
@@ -55,98 +55,141 @@ th{font-weight:700} td.num{text-align:right;font-variant-numeric:tabular-nums}
 .status.pass{color:#006300} .status.report{color:var(--muted)}
 #tip{position:fixed;pointer-events:none;background:#15303A;color:#F7F5EF;font-size:14px;padding:6px 10px;border-radius:8px;display:none;max-width:280px;z-index:9}
 details{margin:8px 0} summary{cursor:pointer;color:var(--accent)}
+.tile small{display:block;font-size:13px;color:var(--muted);margin-top:6px;line-height:1.35}
+.tile.na b{font-size:20px}
+.controls{display:flex;gap:10px;align-items:center;margin:8px 0 4px;font-size:15px}
+select{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+h2{scroll-margin-top:10px} h3{font-family:var(--serif);font-size:19px;margin:22px 0 6px}
+.cap{font-size:14px;color:var(--muted);margin:2px 0 8px}
+.heat{border-collapse:separate;border-spacing:2px;width:auto;font-size:13px}
+.heat td,.heat th{border:0;padding:6px 8px;text-align:center;font-variant-numeric:tabular-nums}
+.heat th{font-weight:600;color:var(--muted);font-size:12px}
+.heat td.cell{min-width:46px;border-radius:4px}
+.ci{position:absolute;top:8px;height:2px;background:#15303A}
+.ci::before,.ci::after{content:"";position:absolute;top:-4px;width:2px;height:10px;background:#15303A}
+.ci::before{left:0}.ci::after{right:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:24px}.two>div{min-width:0}@media (max-width:760px){.two{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
     <a class="brand" href="/"><span class="mark">H</span>Health Transformation Lab</a>
-    <p class="kicker">PerioBench</p>
-    <h1>Data quality</h1>
-    <p>What checks find in a dental record: what's missing, what can't be right, and what goes backwards over time.</p>
+    <p class="kicker">PerioBench · Data quality</p>
+    <h1>EHR DQ grader</h1>
+    <p>Is this dental record fit for finding gum disease? Five domains: completeness, accuracy and consistency (Zozus), temporal plausibility (Kahn) and reliability (Liaw), then one section per domain.</p>
   </div>
 </header>
-<main class="wrap viz" id="app">
-  <section><p class="note" id="note">Loading…</p><div class="tiles" id="tiles"></div></section>
+<main class="wrap viz">
   <section>
-    <h2>The checks</h2>
-    <p>Conformance asks whether a value is possible, completeness whether it is there, and plausibility whether it makes sense over time. Completeness is reported, not passed or failed.</p>
-    <div class="scroll"><table id="checks"><thead><tr><th>Status</th><th>Check</th><th class="num">Failing</th><th class="num">Checked</th><th class="num">%</th></tr></thead><tbody></tbody></table></div>
+    <p class="note" id="note">Loading…</p>
+    <div class="controls"><label for="clinic">Clinic</label><select id="clinic"><option value="All">All clinics</option></select>
+      <span class="cap">Tiles are for all clinics; the filter applies to accuracy by source and the checks table.</span></div>
+    <div class="tiles" id="tiles"></div>
   </section>
   <section>
-    <h2>What's missing from the visit record</h2>
-    <p>The share of visits without each part of the record.</p>
-    <div class="bars" id="missing"></div>
-    <h3>By clinic</h3>
-    <p>The same, per clinic. A clinic more than two standard deviations from the rest is flagged ⚠.</p>
-    <div class="scroll"><table id="clinics"></table></div>
+    <h2>Completeness</h2>
+    <div class="two">
+      <div><h3>Missing by evidence column (%)</h3><p class="cap">Share of visits where the column is empty.</p><div class="bars" id="missing"></div></div>
+      <div><h3>Conformance, completeness and plausibility checks</h3><p class="cap">PASS: no failures allowed and none found, or very few; REPORT: a rate to read, with no pass mark.</p>
+        <div class="scroll"><table id="checks"><thead><tr><th>Category</th><th>Check</th><th class="num">Checked</th><th class="num">Failed</th><th class="num">Pass %</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>
+    </div>
   </section>
   <section>
-    <h2>Calls that go backwards</h2>
-    <p>Under the 2017 classification a patient's stage doesn't go down, because lost attachment and bone don't grow back. When a method's answer goes down from one visit to the next, something in the record disagrees with an earlier visit. Share of later visits where the stage drops:</p>
-    <div class="bars" id="stagedrop"></div>
-    <p>Share of later visits where periodontitis disappears:</p>
-    <div class="bars" id="resolved"></div>
+    <h2>Accuracy</h2>
+    <div class="two">
+      <div><h3>Visits each source gives a status for (%)</h3><div class="bars" id="answered"></div></div>
+      <div><h3>Agreement with the truth where it answers (%)</h3><p class="cap">Comparison to the synthetic truth, the top rung of the accuracy hierarchy.</p><div class="bars" id="agree"></div></div>
+    </div>
+    <h3>Concordance between sources (%)</h3><p class="cap">How often two sources give the same status where both answer. Comparison to an independent measurement, truth excluded.</p>
+    <div class="scroll"><table class="heat" id="concord"></table></div>
+  </section>
+  <section>
+    <h2>Consistency</h2>
+    <div>
+      <div><h3>Periodontitis prevalence by clinic (%)</h3><p class="cap">Rules, exam form first, with 95% intervals. A clinic beyond 2 SD of the others is flagged ⚠.</p><div class="bars" id="prev"></div></div>
+      <div><h3>By scale: all visits, complete cases, reference set</h3><div class="scroll"><table id="scale"><thead><tr><th>Method</th><th>Scale</th><th class="num">Visits</th><th class="num">Periodontitis %</th><th class="num">Stage III–IV %</th></tr></thead><tbody></tbody></table></div></div>
+    </div>
+  </section>
+  <section>
+    <h2>Temporal plausibility</h2>
+    <h3>Stage at one visit (rows) and the next (columns), % of the row</h3>
+    <p class="cap">Rules, exam form first. Cells left of the diagonal are improvements: a charting or rule error unless the patient was treated.</p>
+    <div class="scroll"><table class="heat" id="trans"></table></div>
+    <h3>Implausible change by method</h3><p class="cap">Visit pairs 1–2 years apart with no treatment between. Lower improved and resolved shares are more plausible.</p>
+    <div class="scroll"><table id="temporal"><thead><tr><th>Method</th><th class="num">Visit pairs</th><th class="num">Improved %</th><th class="num">Same %</th><th class="num">Worse %</th><th class="num">Resolved %</th><th class="num">Stage dropped %</th></tr></thead><tbody></tbody></table></div>
     <p class="note" id="injected"></p>
   </section>
   <section>
+    <h2>Reliability</h2>
+    <p><b>Not assessed.</b> It needs real reviewers staging the same records, and their agreement with each other (<a href="../scoring/">how scoring works</a>). Simulated reviewers are a dry run and aren't shown.</p>
+  </section>
+  <section>
     <h2>How messy the perio charts are</h2>
-    <p>In the synthetic Open Dental extract (2,000 patients), measured the same way a real extract would be. Counts only.</p>
+    <p>Added for the tooth-loss work: the synthetic Open Dental extract (2,000 patients), measured the way a real extract would be. Counts only.</p>
     <div class="bars" id="mess"></div>
-    <p>Method and code: <a href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/python/health_transformation_lab_nlp/dq_site.py">dq_site.py</a> builds <a href="https://raw.githubusercontent.com/healthtransformationlab/health-transformation-lab-nlp/main/docs/site/data-quality.json">data-quality.json</a> in the project repo from its committed results; this page reads that file directly, so it updates when the repo does. How scores work: <a href="../scoring/">scoring</a>.</p>
+    <p class="cap">The same design as the project's Databricks dashboard (EHR DQ grader), as a static report. Data: <a id="srclink" href="#">data-quality.json</a>, built by <a href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/python/health_transformation_lab_nlp/dq_site.py">dq_site.py</a> from the same tables the dashboard reads.</p>
   </section>
 </main>
 <div id="tip" role="tooltip"></div>
 <script>
 (function(){
-  var tip=document.getElementById('tip');
-  function el(t,cls,txt){var e=document.createElement(t);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
-  function fmt(x){if(x==null)return '–';if(x>0&&x<0.05)return '<0.1%';return (Math.round(x*10)/10).toLocaleString()+'%';}
-  function show(e,lines){tip.textContent='';lines.forEach(function(l,i){var d=el(i?'div':'strong',null,l);tip.appendChild(d);if(!i)tip.appendChild(el('br'));});tip.style.display='block';
-    var r=e.getBoundingClientRect?null:null;}
-  function move(ev){tip.style.left=Math.min(ev.clientX+14,window.innerWidth-300)+'px';tip.style.top=(ev.clientY+14)+'px';}
-  function bars(id,rows,max){
-    var box=document.getElementById(id);max=max||Math.max.apply(null,rows.map(function(r){return r.v||0;}).concat([1]));
-    rows.forEach(function(r){
-      var row=el('div','bar-row');row.tabIndex=0;
-      row.setAttribute('aria-label',r.label+': '+fmt(r.v)+(r.detail?', '+r.detail:''));
-      row.appendChild(el('div',null,r.label));
-      var tr=el('div','bar-track'),b=el('div','bar'),w=Math.max(0,(r.v||0)/max*85);
-      b.style.width=w+'%';tr.appendChild(b);var val=el('span','bar-val',fmt(r.v));val.style.left=w+'%';tr.appendChild(val);row.appendChild(tr);
-      var lines=[fmt(r.v),r.label].concat(r.detail?[r.detail]:[]);
-      row.addEventListener('pointerenter',function(ev){show(row,lines);move(ev);});
-      row.addEventListener('pointermove',move);
-      row.addEventListener('pointerleave',function(){tip.style.display='none';});
-      row.addEventListener('focus',function(){show(row,lines);var b=row.getBoundingClientRect();tip.style.left=Math.min(b.left,window.innerWidth-300)+'px';tip.style.top=(b.bottom+6)+'px';});
-      row.addEventListener('blur',function(){tip.style.display='none';});
-      box.appendChild(row);
-    });
-  }
   var SRC='https://raw.githubusercontent.com/healthtransformationlab/health-transformation-lab-nlp/main/docs/site/data-quality.json';
-  fetch(SRC).then(function(r){return r.json();}).then(function(d){
+  document.getElementById('srclink').href=SRC;
+  var tip=document.getElementById('tip'), RAMP=['#cde2fb','#b7d3f6','#9ec5f4','#86b6ef','#6da7ec','#5598e7','#3987e5','#2a78d6','#256abf','#1c5cab','#184f95','#104281','#0d366b'];
+  function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
+  function fmt(x){if(x==null)return '–';if(x>0&&x<0.05)return '<0.1%';return (Math.round(x*10)/10).toLocaleString()+'%';}
+  function show(lines){tip.textContent='';lines.forEach(function(l,i){tip.appendChild(el(i?'div':'strong',null,l));});tip.style.display='block';}
+  function move(ev){tip.style.left=Math.min(ev.clientX+14,window.innerWidth-300)+'px';tip.style.top=(ev.clientY+14)+'px';}
+  function hover(node,lines){node.tabIndex=0;node.addEventListener('pointerenter',function(e){show(lines);move(e);});node.addEventListener('pointermove',move);
+    node.addEventListener('pointerleave',function(){tip.style.display='none';});
+    node.addEventListener('focus',function(){show(lines);var b=node.getBoundingClientRect();tip.style.left=Math.min(b.left,window.innerWidth-300)+'px';tip.style.top=(b.bottom+6)+'px';});
+    node.addEventListener('blur',function(){tip.style.display='none';});}
+  function bars(id,rows,max){var box=document.getElementById(id);box.textContent='';
+    rows.forEach(function(r){var row=el('div','bar-row');row.setAttribute('aria-label',r.label+': '+fmt(r.v));
+      row.appendChild(el('div',null,r.label+(r.flag?' ⚠':'')));var tr=el('div','bar-track'),b=el('div','bar'),w=(r.v||0)/max*85;b.style.width=w+'%';tr.appendChild(b);
+      if(r.lo!=null){var ci=el('div','ci');ci.style.left=(r.lo/max*85)+'%';ci.style.width=((r.hi-r.lo)/max*85)+'%';tr.appendChild(ci);}
+      var val=el('span','bar-val',fmt(r.v));val.style.left=((r.hi!=null?r.hi:r.v||0)/max*85)+'%';tr.appendChild(val);row.appendChild(tr);
+      hover(row,[fmt(r.v),r.label].concat(r.detail?[r.detail]:[]));box.appendChild(row);});}
+  function heat(id,rowsL,colsL,get,tipf){var t=document.getElementById(id);t.textContent='';var h=el('tr');h.appendChild(el('th'));colsL.forEach(function(c){h.appendChild(el('th',null,c[1]));});t.appendChild(h);
+    rowsL.forEach(function(r){var tr=el('tr');tr.appendChild(el('th',null,r[1]));colsL.forEach(function(c){var v=get(r[0],c[0]),td=el('td','cell',v==null?'':Math.round(v)+'');
+      if(v!=null){var i=Math.min(RAMP.length-1,Math.floor(v/100*(RAMP.length-1)));td.style.background=RAMP[i];td.style.color=i>=6?'#ffffff':'#0b0b0b';hover(td,tipf(r,c,v));}tr.appendChild(td);});t.appendChild(tr);});}
+  var D;
+  function byClinic(){var c=document.getElementById('clinic').value,s=D.sections;
+    var acc=s.accuracy.filter(function(r){return r.clinic===c;});
+    bars('answered',acc.map(function(r){return {label:r.label,v:r.answered_pct,detail:'of '+r.visit_count.toLocaleString()+' visits'};}),100);
+    bars('agree',acc.map(function(r){return {label:r.label,v:r.agree_pct,detail:'where it gives a status'};}),100);
+    var tb=document.querySelector('#checks tbody');tb.textContent='';
+    s.checks.filter(function(r){return r.clinic===c;}).forEach(function(r){var tr=el('tr');[r.category,r.check.split(':')[1].replace(/_/g,' ')].forEach(function(x){tr.appendChild(el('td',null,x));});
+      [r.checked_count.toLocaleString(),r.failed_count.toLocaleString(),r.pass_pct+'%'].forEach(function(x){tr.appendChild(el('td','num',x));});
+      tr.appendChild(el('td','status '+(r.status==='PASS'?'pass':'report'),r.status==='PASS'?'✓ Pass':'ⓘ Report'));tb.appendChild(tr);});}
+  fetch(SRC).then(function(r){return r.json();}).then(function(d){D=d;var s=d.sections,T=s.tiles;
     document.getElementById('note').textContent=d.note;
-    var pass=d.checks.filter(function(c){return c.status==='PASS';});
-    var passing=pass.filter(function(c){return c.n_fail===0;}).length;
-    var chart=d.completeness.filter(function(c){return c.part==='probing_chart';})[0];
-    [[d.visit_count.toLocaleString(),'synthetic visits, '+d.patient_count.toLocaleString()+' patients'],
-     [passing+' of '+pass.length,'pass/fail checks with no failures'],
-     [d.injected.caught_count+' of '+d.injected.injected_count,'planted charting errors caught'],
-     [fmt(chart.missing_pct),'of visits without a gum chart']].forEach(function(t){var x=el('div','tile');x.appendChild(el('b',null,t[0]));x.appendChild(el('span',null,t[1]));document.getElementById('tiles').appendChild(x);});
-    var tb=document.querySelector('#checks tbody');
-    d.checks.forEach(function(c){var tr=el('tr');
-      var s=c.status==='PASS'?(c.n_fail?'✓ Pass (few)':'✓ Pass'):'ⓘ Reported';
-      tr.appendChild(el('td','status '+(c.status==='PASS'?'pass':'report'),s));
-      tr.appendChild(el('td',null,c.label));
-      tr.appendChild(el('td','num',c.n_fail.toLocaleString()));tr.appendChild(el('td','num',c.n_checked.toLocaleString()));tr.appendChild(el('td','num',fmt(c.fail_pct)));tb.appendChild(tr);});
-    bars('missing',d.completeness.map(function(c){return {label:c.label,v:c.missing_pct,detail:'of '+c.n_rows.toLocaleString()+' visits'};}),100);
-    var parts=[],clin=[];d.by_clinic.forEach(function(r){if(parts.indexOf(r.label)<0)parts.push(r.label);if(clin.indexOf(r.clinic)<0)clin.push(r.clinic);});
-    var t=document.getElementById('clinics'),h=el('tr');h.appendChild(el('th',null,'Clinic'));parts.forEach(function(p){h.appendChild(el('th','num',p.replace(/^Visit has an? /,'No ')));});var th=el('thead');th.appendChild(h);t.appendChild(th);
-    var tbody=el('tbody');clin.forEach(function(cl){var tr=el('tr');tr.appendChild(el('td',null,'Clinic '+cl));parts.forEach(function(p){var r=d.by_clinic.filter(function(x){return x.clinic===cl&&x.label===p;})[0];tr.appendChild(el('td','num',r?fmt(r.missing_pct)+(r.is_outlier?' ⚠':''):'–'));});tbody.appendChild(tr);});t.appendChild(tbody);
-    var tm=d.temporal.slice(); /* each list sorted largest first */
-    bars('stagedrop',tm.sort(function(a,b){return b.stage_drop_pct-a.stage_drop_pct;}).map(function(m){return {label:m.label,v:m.stage_drop_pct,detail:'of '+m.n_later_visits.toLocaleString()+' later visits'};}));
-    bars('resolved',tm.slice().sort(function(a,b){return b.perio_resolved_pct-a.perio_resolved_pct;}).map(function(m){return {label:m.label,v:m.perio_resolved_pct,detail:'of '+m.n_later_visits.toLocaleString()+' later visits'};}));
-    document.getElementById('injected').textContent='Planted errors: the generator added '+d.injected.injected_count+' charting mistakes on purpose. The over-time checks catch '+d.injected.caught_count+' of them ('+fmt(d.injected.caught_pct)+'), and flag '+fmt(d.injected.false_flag_pct)+' of visits that had no planted mistake.';
-    bars('mess',d.open_dental.map(function(r){return {label:r.label,v:r.pct,detail:r.numerator.toLocaleString()+' of '+r.denominator.toLocaleString()};}),100);
+    var sel=document.getElementById('clinic');Array.from(new Set(s.accuracy.map(function(r){return r.clinic;}))).filter(function(c){return c!=='All';}).forEach(function(c){var o=el('option',null,'Clinic '+c);o.value=c;sel.appendChild(o);});
+    sel.addEventListener('change',byClinic);
+    [[fmt(T.completeness_pct),'Completeness','Visits with exam form, diagnosis codes and gum measurements all present.'],
+     [fmt(T.accuracy_pct),'Accuracy','Rules on the whole record, measurements first, against the truth.'],
+     [T.consistency_pts+' points','Consistency','Spread of periodontitis prevalence across the '+T.clinic_count+' clinics. Smaller is steadier.'],
+     [fmt(T.implausible_pct),'Temporal plausibility','Visit pairs whose stage improved without treatment. Lower is better.'],
+     ['Not assessed','Reliability','Needs real reviewers. Simulated reviewers are a dry run.',true],
+     [fmt(T.accuracy_design_pct),'Accuracy, exam form first','The study design’s order. The order changes the answer.']].forEach(function(x){
+      var t=el('div','tile'+(x[3]?' na':''));t.appendChild(el('b',null,x[0]));t.appendChild(el('span',null,x[1]));t.appendChild(el('small',null,x[2]));document.getElementById('tiles').appendChild(t);});
+    bars('missing',s.missingness.map(function(r){return {label:r.label,v:r.missing_pct,detail:r.missing_count.toLocaleString()+' of '+r.row_count.toLocaleString()+' visits'};}),100);
+    byClinic();
+    var src=[];s.concordance.forEach(function(r){[[r.method_a,r.label_a],[r.method_b,r.label_b]].forEach(function(m){if(!src.some(function(x){return x[0]===m[0];}))src.push(m);});});
+    heat('concord',src,src,function(a,b){if(a===b)return null;var r=s.concordance.filter(function(x){return (x.method_a===a&&x.method_b===b)||(x.method_a===b&&x.method_b===a);})[0];return r?r.agree_pct:null;},
+      function(a,b,v){var r=s.concordance.filter(function(x){return (x.method_a===a[0]&&x.method_b===b[0])||(x.method_a===b[0]&&x.method_b===a[0]);})[0];return [v+'% agree',a[1]+' × '+b[1],'kappa '+r.kappa+', '+r.visit_count.toLocaleString()+' visits'];});
+    bars('prev',s.prevalence_clinic.map(function(r){return {label:'Clinic '+r.clinic,v:r.periodontitis_pct,lo:r.ci_low_pct,hi:r.ci_high_pct,flag:r.is_outlier,detail:'95% CI '+r.ci_low_pct+'–'+r.ci_high_pct+'%, '+r.people_count+' people'};}),100);
+    var sb=document.querySelector('#scale tbody');s.prevalence_scale.forEach(function(r){var tr=el('tr');tr.appendChild(el('td',null,r.label));tr.appendChild(el('td',null,r.scale.replace(/_/g,' ')));
+      [r.visit_count.toLocaleString(),fmt(r.periodontitis_pct),fmt(r.stage3_4_pct)].forEach(function(x){tr.appendChild(el('td','num',x));});sb.appendChild(tr);});
+    var st=[];s.transitions.forEach(function(r){if(!st.some(function(x){return x[0]===r.from_status;}))st.push([r.from_status,r.from_label]);});
+    var order=['healthy_gingivitis','periodontitis_stage_1','periodontitis_stage_2','periodontitis_stage_3','periodontitis_stage_4'];st.sort(function(a,b){return order.indexOf(a[0])-order.indexOf(b[0]);});
+    heat('trans',st,st,function(a,b){var r=s.transitions.filter(function(x){return x.from_status===a&&x.to_status===b;})[0];return r?r.row_pct:null;},
+      function(a,b,v){var r=s.transitions.filter(function(x){return x.from_status===a[0]&&x.to_status===b[0];})[0];return [v+'% of row',a[1]+' → '+b[1],r.pair_count.toLocaleString()+' visit pairs, '+r.direction];});
+    var tt=document.querySelector('#temporal tbody');s.temporal.forEach(function(r){var tr=el('tr');tr.appendChild(el('td',null,r.label));tr.appendChild(el('td','num',r.pair_count.toLocaleString()));
+      [r.improved_pct,r.same_pct,r.worse_pct,r.resolved_pct,r.stage_drop_pct].forEach(function(x){tr.appendChild(el('td','num',fmt(x)));});tt.appendChild(tr);});
+    var I=s.injected;document.getElementById('injected').textContent='Injected charting errors (synthetic only): '+I.injected_count+' added on purpose; the temporal checks catch '+I.caught_count+' ('+fmt(I.caught_pct)+'), and flag '+fmt(I.false_flag_pct)+' of visits with no injected error.';
+    bars('mess',s.open_dental.map(function(r){return {label:r.label,v:r.pct,detail:r.numerator.toLocaleString()+' of '+r.denominator.toLocaleString()};}),100);
   }).catch(function(){document.getElementById('note').textContent='The data could not be loaded. Open the data file directly: '+SRC;});
 })();
 </script>
