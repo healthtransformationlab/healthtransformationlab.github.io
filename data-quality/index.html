@@ -175,6 +175,24 @@
   .home:hover { border-color: var(--accent); color: var(--accent-ink); }
   .home b { display:grid; place-items:center; width:22px; height:22px; border-radius:6px; background:#F2A070; color:#0F2A33; font-size:12px; }
   a { color: var(--accent-ink); }
+  .hb { display:grid; grid-template-columns: minmax(140px, 36%) 1fr; gap: 2px 12px; align-items:center; font-size:13px; padding:3px 0; }
+  .hb .lab { color: var(--ink-2); text-align:right; }
+  .hb .trk { position:relative; height:18px; border-left:1px solid var(--baseline); margin-right:64px; }
+  .hb .bar { height:14px; margin-top:2px; border-radius:0 4px 4px 0; min-width:1px; }
+  .hb .v { position:absolute; top:0; padding-left:6px; font-family:var(--font-mono); font-size:12.5px; color:var(--ink); white-space:nowrap; }
+  .hb .ci { position:absolute; top:8px; height:2px; background:var(--ink); }
+  .hb .ci::before,.hb .ci::after { content:""; position:absolute; top:-4px; width:2px; height:10px; background:var(--ink); }
+  .hb .ci::before { left:0 } .hb .ci::after { right:0 }
+  .hb .ov { position:absolute; top:-3px; bottom:-3px; width:0; border-left:2px dashed var(--ink); }
+  .hb.sel .lab { color: var(--ink); font-weight:600; }
+  .hb:focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+  .axis { display:grid; grid-template-columns: minmax(140px, 36%) 1fr; gap:12px; font-size:11px; color:var(--ink-3); }
+  .axis div:last-child { display:flex; justify-content:space-between; margin-right:64px; }
+  @media (max-width: 640px) {
+    .hb, .axis { grid-template-columns: 1fr; }
+    .hb .lab { text-align:left; padding-top:4px; }
+    .axis div:first-child { display:none; }
+  }
   .loading { padding: 40px 0; color: var(--ink-2); }
   .matrix .c.sel, .clinic-sel { outline: 2px solid var(--ink); }
 </style>
@@ -202,50 +220,41 @@ function useTip() {
 }
 const Tip = ({ tip }) => tip ? <div className="tip" style={{ left: tip.x, top: tip.y }}>{tip.content}</div> : null;
 
-function HBars({ rows, max = 100, unit = "%", flagAbove, w = 640, labelW = 230 }) {
-  const [tip, show, hide] = useTip();
-  const rowH = 24, plotW = w - labelW - 56, h = rows.length * rowH + 20;
-  return (<div className="chart"><svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label="Horizontal bar chart">
-    {[0,25,50,75,100].map(t => <g key={t} transform={`translate(${labelW + plotW*t/max},0)`}><line y1="0" y2={h-18} className="grid-line"/><text y={h-4} textAnchor="middle" className="axis-text">{t}{unit}</text></g>)}
-    {rows.map((r, i) => { const bw = Math.max(0, plotW * (r.v||0) / max), flagged = flagAbove != null && r.v > flagAbove;
-      return (<g key={r.k} transform={`translate(0,${i*rowH+4})`} tabIndex="0" aria-label={`${r.k}: ${fmt(r.v)}${unit}`}
-          onMouseMove={e => show(e, <span><b>{r.k}</b> · {fmt(r.v)}{unit}</span>)} onMouseLeave={hide}>
-        <rect x="0" y="0" width={w} height={rowH-4} fill="transparent"/>
-        <text x={labelW-10} y="13" textAnchor="end" className="lbl">{r.k}</text>
-        <rect x={labelW} y="2" width={bw} height={rowH-8} fill={flagged ? "var(--crit)" : "var(--accent)"}/>
-        <text x={labelW+bw+6} y="13" className="val">{fmt(r.v)}{unit}{flagged ? " ▲" : ""}</text></g>); })}
-    <line x1={labelW} x2={labelW} y1="0" y2={h-18} className="base"/></svg><Tip tip={tip}/></div>);
+function HBars({ rows, max = 100, unit = "%", flagAbove }) {
+  return (<div role="list">
+    <div className="axis" aria-hidden="true"><div></div><div>{[0,25,50,75,100].map(t => <span key={t}>{t}{unit}</span>)}</div></div>
+    {rows.map(r => { const pct = Math.max(0, Math.min(100, 100 * (r.v || 0) / max)), flagged = flagAbove != null && r.v > flagAbove;
+      return (<div className="hb" key={r.k} role="listitem" tabIndex="0" title={`${r.k}: ${fmt(r.v)}${unit}`} aria-label={`${r.k}: ${fmt(r.v)}${unit}`}>
+        <div className="lab">{r.k}</div>
+        <div className="trk"><div className="bar" style={{ width: pct + "%", background: flagged ? "var(--crit)" : "var(--accent)" }}></div>
+          <span className="v" style={{ left: pct + "%" }}>{fmt(r.v)}{unit}{flagged ? " ▲" : ""}</span></div></div>); })}
+  </div>);
 }
 
 function Funnel({ steps }) {
-  const [tip, show, hide] = useTip();
-  const max = steps[0].visit_count || 1, w = 640, rowH = 30, labelW = 290, plotW = w - labelW - 80, h = steps.length * rowH;
-  return (<div className="chart"><svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label="Complete-case funnel">
-    {steps.map((s, i) => { const bw = plotW * s.visit_count / max, pct = 100 * s.visit_count / max;
-      return (<g key={s.label} transform={`translate(0,${i*rowH})`} onMouseMove={e => show(e, <span><b>{s.label}</b> · {s.visit_count.toLocaleString()} ({fmt(pct)}% of start)</span>)} onMouseLeave={hide}>
-        <rect width={w} height={rowH} fill="transparent"/><text x={labelW-10} y="19" textAnchor="end" className="lbl">{s.label}</text>
-        <rect x={labelW} y="6" width={bw} height={rowH-12} fill={i === steps.length-1 ? "var(--accent-ink)" : "var(--accent)"} opacity={1 - i*0.12}/>
-        <text x={labelW+bw+6} y="19" className="val">{s.visit_count.toLocaleString()}</text></g>); })}
-    <line x1={labelW} x2={labelW} y1="0" y2={h} className="base"/></svg><Tip tip={tip}/></div>);
+  const max = steps[0].visit_count || 1;
+  return (<div role="list">{steps.map((s, i) => { const pct = 100 * s.visit_count / max;
+    return (<div className="hb" key={s.label} role="listitem" tabIndex="0" title={`${s.label}: ${s.visit_count.toLocaleString()} (${fmt(pct)}% of start)`}>
+      <div className="lab">{s.label}</div>
+      <div className="trk"><div className="bar" style={{ width: pct + "%", background: i === steps.length - 1 ? "var(--accent-ink)" : "var(--accent)", opacity: 1 - i * 0.12 }}></div>
+        <span className="v" style={{ left: pct + "%" }}>{s.visit_count.toLocaleString()}</span></div></div>); })}</div>);
 }
 
 function ClinicBars({ rows, overall, selected }) {
-  const [tip, show, hide] = useTip();
-  const w = 640, h = 190, padL = 36, padB = 34, padT = 10, plotW = w - padL - 10, plotH = h - padB - padT;
-  const max = 80, n = rows.length, slot = plotW / n, bw = Math.min(40, slot - 8), y = v => padT + plotH - plotH * v / max;
+  const max = 80, x = v => Math.max(0, Math.min(100, 100 * v / max));
   const vals = rows.map(r => r.periodontitis_pct), spread = Math.max(...vals) - Math.min(...vals);
-  return (<div className="chart"><svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label="Periodontitis prevalence by clinic">
-    {[0,20,40,60,80].map(t => <g key={t}><line x1={padL} x2={w-10} y1={y(t)} y2={y(t)} className="grid-line"/><text x={padL-6} y={y(t)+4} textAnchor="end" className="axis-text">{t}%</text></g>)}
-    {rows.map((r, i) => { const x = padL + slot*i + (slot-bw)/2, v = r.periodontitis_pct, dev = Math.abs(v - overall), sel = selected === r.clinic;
-      return (<g key={r.clinic} onMouseMove={e => show(e, <span><b>Clinic {r.clinic}</b> · {fmt(v)}% (95% CI {fmt(r.ci_low_pct)}–{fmt(r.ci_high_pct)}), {v >= overall ? "+" : "−"}{fmt(dev)} vs overall, {r.people_count} people</span>)} onMouseLeave={hide}>
-        <rect x={padL+slot*i} y={padT} width={slot} height={plotH} fill="transparent"/>
-        <rect x={x} y={y(v)} width={bw} height={plotH-(y(v)-padT)} fill={dev > 8 ? "var(--series-2)" : "var(--accent)"} stroke={sel ? "var(--ink)" : "none"} strokeWidth="2"/>
-        <line x1={x+bw/2} x2={x+bw/2} y1={y(r.ci_high_pct)} y2={y(r.ci_low_pct)} stroke="var(--ink)" strokeWidth="1.5"/>
-        <text x={x+bw/2} y={h-padB+14} textAnchor="middle" className="axis-text">{sel ? "▸ " : ""}Clinic {r.clinic}</text></g>); })}
-    <line x1={padL} x2={w-10} y1={y(overall)} y2={y(overall)} stroke="var(--ink)" strokeWidth="1.5" strokeDasharray="4 3"/>
-    <text x={w-12} y={y(overall)-5} textAnchor="end" className="val">overall {fmt(overall)}%</text>
-    <line x1={padL} x2={w-10} y1={y(0)} y2={y(0)} className="base"/></svg><Tip tip={tip}/>
-    <div className="legend"><span><i className="sw" style={{ background:"var(--accent)" }}></i>Within 8 pts of overall</span><span><i className="sw" style={{ background:"var(--series-2)" }}></i>More than 8 pts from overall</span><span>Lines: 95% intervals</span><span>Spread {fmt(spread)} pts</span></div></div>);
+  return (<div>
+    <div className="axis" aria-hidden="true"><div></div><div>{[0,20,40,60,80].map(t => <span key={t}>{t}%</span>)}</div></div>
+    <div role="list">{rows.map(r => { const v = r.periodontitis_pct, dev = Math.abs(v - overall), sel = selected === r.clinic;
+      return (<div className={`hb ${sel ? "sel" : ""}`} key={r.clinic} role="listitem" tabIndex="0"
+          title={`Clinic ${r.clinic}: ${fmt(v)}% (95% CI ${fmt(r.ci_low_pct)}–${fmt(r.ci_high_pct)}), ${v >= overall ? "+" : "−"}${fmt(dev)} vs overall, ${r.people_count} people`}>
+        <div className="lab">{sel ? "▸ " : ""}Clinic {r.clinic}</div>
+        <div className="trk"><div className="bar" style={{ width: x(v) + "%", background: dev > 8 ? "var(--series-2)" : "var(--accent)" }}></div>
+          <div className="ci" style={{ left: x(r.ci_low_pct) + "%", width: (x(r.ci_high_pct) - x(r.ci_low_pct)) + "%" }}></div>
+          <div className="ov" style={{ left: x(overall) + "%" }}></div>
+          <span className="v" style={{ left: x(r.ci_high_pct) + "%" }}>{fmt(v)}%</span></div></div>); })}</div>
+    <div className="legend" style={{ marginTop:8 }}><span><i className="sw" style={{ background:"var(--accent)" }}></i>Within 8 pts of overall</span><span><i className="sw" style={{ background:"var(--series-2)" }}></i>More than 8 pts from overall</span><span>Dashed line: overall {fmt(overall)}%</span><span>Whiskers: 95% intervals</span><span>Spread {fmt(spread)} pts</span></div>
+  </div>);
 }
 
 function Matrix({ labels, value, flagBelow }) {
@@ -359,7 +368,7 @@ function App({ d }) {
             {reorder ? <span className="pill warn" style={{ marginTop:0 }}>Outranks step {prev.n}</span> : <span className="pill good" style={{ marginTop:0 }}>Order holds</span>}</div>); })}</div></Panel>
       <SectionH src="Spec 029, the tooth-loss work">How messy the perio charts are</SectionH>
       <Panel w="w12" eyebrow="Synthetic Open Dental extract · 2,000 patients" title="Chart messiness, measured the way a real extract would be" note="Counts only. Real rates come from running the same profile on a real extract.">
-        <HBars rows={S.open_dental.map(r => ({ k: r.label, v: r.pct }))} w={1000} labelW={380}/></Panel>
+        <HBars rows={S.open_dental.map(r => ({ k: r.label, v: r.pct }))}/></Panel>
     </div>
     <p className="foot">Every number is computed from the project's committed synthetic data, by the same tables as its Databricks dashboard (<a href={CODE}>dq_site.py</a>; <a href={SRC}>data</a>). Status thresholds (completeness 80%/25%, accuracy 85%/70%, spread 10/20 points, implausible 5%/10%, missingness 30%, concordance 65%, 8-point clinic gap) are starting points to agree with a research team. Personal learning project, not affiliated with any employer or organization; the patients are synthetic. Hover any bar or cell for its value.</p>
     <a className="home" href="/" style={{ marginTop:16 }}><b>H</b>← Back to home</a>
