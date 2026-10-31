@@ -35,12 +35,14 @@ table{border-collapse:collapse;width:100%;font-size:15px;margin:14px 0}
 th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}
 th{font-weight:700}
 .scroll{overflow-x:auto}
+.back{display:inline-flex;align-items:center;gap:8px;margin-top:22px;padding:8px 14px;border:1px solid rgba(213,227,225,.45);border-radius:999px;color:var(--paper);text-decoration:none;font-weight:600;font-size:15px}.back:hover{background:rgba(255,255,255,.08)}.back.dark{border-color:var(--line);color:var(--ink);margin:28px 0 8px}.back.dark:hover{border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <a class="brand" href="/"><span class="mark">H</span>Health Transformation Lab</a>
+    <a class="brand" href="/"><span class="mark">H</span>Health Transformation Lab</a><br>
+    <a class="back" href="/">← Back to home</a>
     <p class="kicker">PerioBench</p>
     <h1>How scoring works</h1>
     <p>What a score means on synthetic records, and how real records would be scored.</p>
@@ -91,6 +93,7 @@ th{font-weight:700}
     <p>The definitions (2017, CDC/AAP, ACES), sources and reading orders side by side: <a href="../standards/">definitions and orders</a>.</p>
     <p>The full page, with the code behind each step: <a href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/docs/scoring.md">docs/scoring.md</a>.</p>
   </section>
+  <a class="back dark" href="/">← Back to home</a>
 </main>
 <footer>
   <div class="wrap">

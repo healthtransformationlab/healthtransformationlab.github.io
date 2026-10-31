@@ -3,157 +3,377 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Data quality · Health Transformation Lab</title>
+<title>Perio DQ Monitor · Health Transformation Lab</title>
+<meta name="description" content="Is this dental record fit for finding gum disease? Completeness, accuracy, consistency, temporal plausibility and reliability, on synthetic records.">
 <link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><meta name="theme-color" content="#0F2A33">
-<meta name="description" content="What data-quality checks find in a synthetic dental record: what is missing, what goes backwards over time, and how messy perio charts are. Synthetic data.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Public+Sans:wght@400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-:root{--ink:#15303A;--deep:#0F2A33;--paper:#F7F5EF;--card:#FDFCF9;--line:#D9D3C4;--accent:#B4501F;--peach:#F2A070;--muted:#5C6F75;--mist:#D5E3E1;
-  --serif:'Libre Baskerville', Georgia, serif;--sans:'Public Sans', Arial, sans-serif}
-*{box-sizing:border-box;margin:0}
-body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.6}
-a{color:var(--accent)}
-.wrap{max-width:820px;margin:0 auto;padding:0 24px}
-header{background:var(--deep);color:var(--paper);padding:20px 0 56px}
-.brand{display:inline-flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:700;font-size:17px;color:var(--paper);text-decoration:none}
-.brand .mark{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--peach);color:var(--deep);font-size:16px}
-.kicker{font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--peach);margin-top:40px}
-h1,h2{font-family:var(--serif);font-weight:700;line-height:1.2}
-h1{font-size:clamp(30px,5vw,44px);margin:12px 0}
-header p{color:var(--mist);font-size:20px}
-main section{padding:44px 0;border-bottom:1px solid var(--line)}
-h2{font-size:clamp(22px,3vw,28px);margin-bottom:14px}
-p,ul,ol{margin:12px 0}
-li{margin:8px 0}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 24px;margin:18px 0}
-.note{font-size:15px;color:var(--muted);border-left:3px solid var(--peach);padding-left:12px}
-footer{background:var(--deep);color:var(--mist);padding:36px 0;font-size:14px}
-footer a{color:var(--peach)}
-table{border-collapse:collapse;width:100%;font-size:15px;margin:14px 0}
-th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}
-th{font-weight:700}
-.scroll{overflow-x:auto}
-.viz{--series-1:#2a78d6;--grid:#e1e0d9;--muted:#5C6F75;--good:#0ca30c;--warning:#b77900}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0}
-.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.tile b{display:block;font-size:30px;line-height:1.1;color:var(--ink)}
-.tile span{font-size:14px;color:var(--muted)}
-.bars{display:grid;gap:6px;margin:12px 0}
-.bar-row{display:grid;grid-template-columns:minmax(0,44%) 1fr;gap:10px;align-items:center;font-size:15px}
-.bar-row:focus{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
-.bar-track{position:relative;height:18px;border-left:1px solid #c3c2b7}
-.bar{height:14px;margin-top:2px;background:var(--series-1);border-radius:0 4px 4px 0;min-width:1px}
-.bar-val{position:absolute;top:0;font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;padding-left:6px;white-space:nowrap}
-@media (max-width:560px){.bar-row{grid-template-columns:1fr}}
-table{border-collapse:collapse;width:100%;font-size:15px;margin:14px 0}
-th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}
-th{font-weight:700} td.num{text-align:right;font-variant-numeric:tabular-nums}
-.scroll{overflow-x:auto}
-.status{white-space:nowrap;font-weight:600}
-.status.pass{color:#006300} .status.report{color:var(--muted)}
-#tip{position:fixed;pointer-events:none;background:#15303A;color:#F7F5EF;font-size:14px;padding:6px 10px;border-radius:8px;display:none;max-width:280px;z-index:9}
-details{margin:8px 0} summary{cursor:pointer;color:var(--accent)}
+  /* Layout concept: a monitoring console — one filter rail, five domain tiles, then one panel per
+     framework sub-domain (Zozus completeness/accuracy/consistency + Kahn temporal plausibility + Liaw reliability),
+     each panel labeled with the framework rung it satisfies. Scanned, not read. */
+  :root {
+    --page: #f9f9f7;          /* page plane */
+    --surface: #fcfcfb;       /* chart surface / panel */
+    --surface-2: #f2f1ed;     /* muted wells */
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --ink-3: #898781;
+    --hair: #e1e0d9;
+    --baseline: #c3c2b7;
+    --ring: rgba(11,11,11,0.10);
+    --accent: #2a78d6;        /* series-1 blue */
+    --accent-ink: #1c5cab;
+    --series-2: #eb6834;
+    --series-3: #1baf7a;
+    --seq-100: #cde2fb; --seq-200: #9ec5f4; --seq-300: #6da7ec; --seq-400: #3987e5; --seq-500: #256abf; --seq-600: #184f95; --seq-700: #0d366b;
+    --good: #0ca30c; --good-ink: #006300;
+    --warn: #fab219; --warn-ink: #7a5200;
+    --crit: #d03b3b; --crit-ink: #a12727;
+    --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --surface-2: #232321;
+      --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #898781;
+      --hair: #2c2c2a; --baseline: #383835; --ring: rgba(255,255,255,0.10);
+      --accent: #3987e5; --accent-ink: #86b6ef;
+      --series-2: #d95926; --series-3: #199e70;
+      --seq-100: #104281; --seq-200: #1c5cab; --seq-300: #256abf; --seq-400: #2a78d6; --seq-500: #3987e5; --seq-600: #6da7ec; --seq-700: #9ec5f4;
+      --good-ink: #3fc23f; --warn-ink: #fab219; --crit-ink: #e66767;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --surface-2: #232321;
+    --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #898781;
+    --hair: #2c2c2a; --baseline: #383835; --ring: rgba(255,255,255,0.10);
+    --accent: #3987e5; --accent-ink: #86b6ef;
+    --series-2: #d95926; --series-3: #199e70;
+    --seq-100: #104281; --seq-200: #1c5cab; --seq-300: #256abf; --seq-400: #2a78d6; --seq-500: #3987e5; --seq-600: #6da7ec; --seq-700: #9ec5f4;
+    --good-ink: #3fc23f; --warn-ink: #fab219; --crit-ink: #e66767;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--font-ui); font-size: 14px; line-height: 1.45; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding-block: 20px 48px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 600; }
+  button { font: inherit; color: inherit; }
+  button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* top bar */
+  .top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; padding-bottom: 14px; border-bottom: 1px solid var(--hair); }
+  .top h1 { font-size: 22px; letter-spacing: -0.01em; }
+  .top .sub { color: var(--ink-2); margin-top: 2px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border: 1px solid var(--hair); border-radius: 999px; font-size: 12px; color: var(--ink-2); background: var(--surface); font-family: var(--font-mono); }
+  .chip.sample { border-color: var(--warn); color: var(--warn-ink); background: transparent; font-family: var(--font-ui); font-weight: 500; }
+
+  /* filter rail */
+  .rail { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding-block: 14px; }
+  .tabs { display: inline-flex; border: 1px solid var(--hair); border-radius: 8px; overflow: hidden; background: var(--surface); }
+  .tabs button { border: 0; background: transparent; padding: 7px 12px; cursor: pointer; font-weight: 500; color: var(--ink-2); border-right: 1px solid var(--hair); }
+  .tabs button:last-child { border-right: 0; }
+  .tabs button[aria-selected="true"] { background: var(--accent); color: #fff; }
+  .field { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); }
+  .tabs.edr button[aria-selected="true"] { background: var(--ink); color: var(--page); }
+  table.sources tbody tr { cursor: pointer; }
+  table.sources tbody tr:hover { background: var(--surface-2); }
+  table.sources tbody tr.sel { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  table.sources tbody tr.sel td.k { color: var(--accent-ink); }
+  table.sources tbody tr:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  table.sources code { font-family: var(--font-mono); font-size: 12px; }
+  .field select { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--hair); border-radius: 6px; background: var(--surface); color: var(--ink); }
+  .scope { display: inline-flex; gap: 4px; background: var(--surface-2); padding: 3px; border-radius: 8px; }
+  .scope button { border: 0; background: transparent; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--ink-2); }
+  .scope button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--ring); font-weight: 500; }
+
+  /* tiles */
+  .tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-block: 6px 20px; }
+  .tile { background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; padding: 12px 14px; min-width: 0; border-top: 3px solid var(--tile-stripe, var(--baseline)); }
+  .tile .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); font-weight: 500; }
+  .tile .domain { font-weight: 600; margin-top: 2px; }
+  .tile .value { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin-top: 6px; line-height: 1.1; }
+  .tile .value small { font-size: 13px; font-weight: 400; color: var(--ink-2); margin-left: 4px; letter-spacing: 0; }
+  .tile .def { color: var(--ink-2); font-size: 12px; margin-top: 4px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 999px; margin-top: 8px; }
+  .pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .pill.good { color: var(--good-ink); background: color-mix(in srgb, var(--good) 14%, transparent); }
+  .pill.warn { color: var(--warn-ink); background: color-mix(in srgb, var(--warn) 18%, transparent); }
+  .pill.crit { color: var(--crit-ink); background: color-mix(in srgb, var(--crit) 14%, transparent); }
+  .pill.crit::before { border-radius: 1px; transform: rotate(45deg); }
+  .pill.warn::before { border-radius: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .tile.good { --tile-stripe: var(--good); } .tile.warn { --tile-stripe: var(--warn); } .tile.crit { --tile-stripe: var(--crit); }
+
+  /* panels */
+  .grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 14px; }
+  .panel { grid-column: span 6; background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; padding: 14px 16px 16px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+  .panel.w4 { grid-column: span 4; } .panel.w8 { grid-column: span 8; } .panel.w12 { grid-column: span 12; }
+  .phead { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+  .phead .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-ink); font-weight: 600; }
+  .phead h2 { font-size: 15px; margin-top: 2px; }
+  .phead .rung { font-size: 11px; font-family: var(--font-mono); color: var(--ink-3); white-space: nowrap; border: 1px solid var(--hair); border-radius: 4px; padding: 2px 6px; }
+  .note { color: var(--ink-2); font-size: 12.5px; margin: 0; max-width: 62ch; }
+  .section-h { grid-column: span 12; display: flex; align-items: baseline; gap: 12px; margin-top: 8px; }
+  .section-h h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); font-weight: 600; }
+  .section-h .line { flex: 1; height: 1px; background: var(--hair); }
+  .section-h .src { font-size: 12px; color: var(--ink-3); }
+
+  /* charts */
+  .chart { position: relative; }
+  svg { display: block; max-width: 100%; height: auto; overflow: visible; }
+  .axis-text { font-size: 11px; fill: var(--ink-3); font-family: var(--font-ui); }
+  .lbl { font-size: 12px; fill: var(--ink-2); font-family: var(--font-ui); }
+  .val { font-size: 12px; fill: var(--ink); font-family: var(--font-mono); font-weight: 500; }
+  .grid-line { stroke: var(--hair); stroke-width: 1; }
+  .base { stroke: var(--baseline); stroke-width: 1; }
+  .tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--page); font-size: 12px; padding: 6px 8px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, calc(-100% - 8px)); z-index: 5; font-family: var(--font-mono); }
+  .tip b { font-family: var(--font-ui); font-weight: 600; }
+
+  /* tables */
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--hair); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); font-weight: 600; }
+  td.num, th.num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  td.k { font-weight: 500; }
+  .twrap { overflow-x: auto; }
+
+  /* heat matrix */
+  .matrix { display: grid; gap: 3px; font-size: 12px; }
+  .matrix .h { color: var(--ink-3); font-size: 11px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 2px; }
+  .matrix .rh { color: var(--ink-2); display: flex; align-items: center; padding-right: 6px; }
+  .matrix .c { display: flex; align-items: center; justify-content: center; height: 36px; border-radius: 4px; font-family: var(--font-mono); font-variant-numeric: tabular-nums; position: relative; }
+  .matrix .c.diag { background: var(--surface-2); color: var(--ink-3); }
+  .matrix .c.flag { box-shadow: inset 0 0 0 2px var(--crit); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-2); align-items: center; }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -2px; }
+  .ramp { display: inline-flex; gap: 1px; vertical-align: -2px; margin: 0 5px; }
+  .ramp i { width: 10px; height: 10px; display: block; }
+
+  /* cascade */
+  .cascade { display: flex; flex-direction: column; gap: 6px; }
+  .step { display: grid; grid-template-columns: 28px 1fr auto auto; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--hair); border-radius: 8px; background: var(--surface-2); }
+  .step .n { font-family: var(--font-mono); color: var(--ink-3); font-size: 12px; }
+  .step .t { font-weight: 500; }
+  .step .d { color: var(--ink-2); font-size: 12px; }
+  .step .acc { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 13px; }
+  .step.reorder { border-color: var(--warn); }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 12.5px; }
+  .kv dt { color: var(--ink-3); } .kv dd { margin: 0; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  .foot { color: var(--ink-3); font-size: 12px; margin-top: 22px; max-width: 80ch; }
+
+  @media (max-width: 1000px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } .panel, .panel.w4, .panel.w8 { grid-column: span 12; } }
+  @media (max-width: 560px) { .tiles { grid-template-columns: 1fr 1fr; } .tile .value { font-size: 24px; } .step { grid-template-columns: 24px 1fr; } .step .acc, .step .pill { justify-self: start; } }
+  @media (prefers-reduced-motion: no-preference) { .tabs button, .scope button { transition: background .15s; } }
+</style>
+<style>
+  .home { display:inline-flex; align-items:center; gap:8px; color:var(--ink); text-decoration:none; font-size:14px; font-weight:600; margin-bottom:12px;
+    padding:8px 14px 8px 10px; border:1px solid var(--hair); border-radius:999px; background:var(--surface); }
+  .home:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .home b { display:grid; place-items:center; width:22px; height:22px; border-radius:6px; background:#F2A070; color:#0F2A33; font-size:12px; }
+  a { color: var(--accent-ink); }
+  .loading { padding: 40px 0; color: var(--ink-2); }
+  .matrix .c.sel, .clinic-sel { outline: 2px solid var(--ink); }
 </style>
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <a class="brand" href="/"><span class="mark">H</span>Health Transformation Lab</a>
-    <p class="kicker">PerioBench</p>
-    <h1>Data quality</h1>
-    <p>What checks find in a dental record: what's missing, what can't be right, and what goes backwards over time.</p>
-  </div>
-</header>
-<main class="wrap viz" id="app">
-  <section><p class="note" id="note">Loading…</p><div class="tiles" id="tiles"></div></section>
-  <section>
-    <h2>The checks</h2>
-    <p>Conformance asks whether a value is possible, completeness whether it is there, and plausibility whether it makes sense over time. Completeness is reported, not passed or failed.</p>
-    <div class="scroll"><table id="checks"><thead><tr><th>Status</th><th>Check</th><th class="num">Failing</th><th class="num">Checked</th><th class="num">%</th></tr></thead><tbody></tbody></table></div>
-  </section>
-  <section>
-    <h2>What's missing from the visit record</h2>
-    <p>The share of visits without each part of the record.</p>
-    <div class="bars" id="missing"></div>
-    <h3>By clinic</h3>
-    <p>The same, per clinic. A clinic more than two standard deviations from the rest is flagged ⚠.</p>
-    <div class="scroll"><table id="clinics"></table></div>
-  </section>
-  <section>
-    <h2>Calls that go backwards</h2>
-    <p>Under the 2017 classification a patient's stage doesn't go down, because lost attachment and bone don't grow back. When a method's answer goes down from one visit to the next, something in the record disagrees with an earlier visit. Share of later visits where the stage drops:</p>
-    <div class="bars" id="stagedrop"></div>
-    <p>Share of later visits where periodontitis disappears:</p>
-    <div class="bars" id="resolved"></div>
-    <p class="note" id="injected"></p>
-  </section>
-  <section>
-    <h2>How messy the perio charts are</h2>
-    <p>In the synthetic Open Dental extract (2,000 patients), measured the same way a real extract would be. Counts only.</p>
-    <div class="bars" id="mess"></div>
-    <p>Method and code: <a href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/python/health_transformation_lab_nlp/dq_site.py">dq_site.py</a> builds <a href="https://raw.githubusercontent.com/healthtransformationlab/health-transformation-lab-nlp/main/docs/site/data-quality.json">data-quality.json</a> in the project repo from its committed results; this page reads that file directly, so it updates when the repo does. How scores work: <a href="../scoring/">scoring</a>.</p>
-  </section>
-</main>
-<div id="tip" role="tooltip"></div>
-<script>
-(function(){
-  var tip=document.getElementById('tip');
-  function el(t,cls,txt){var e=document.createElement(t);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
-  function fmt(x){if(x==null)return '–';if(x>0&&x<0.05)return '<0.1%';return (Math.round(x*10)/10).toLocaleString()+'%';}
-  function show(e,lines){tip.textContent='';lines.forEach(function(l,i){var d=el(i?'div':'strong',null,l);tip.appendChild(d);if(!i)tip.appendChild(el('br'));});tip.style.display='block';
-    var r=e.getBoundingClientRect?null:null;}
-  function move(ev){tip.style.left=Math.min(ev.clientX+14,window.innerWidth-300)+'px';tip.style.top=(ev.clientY+14)+'px';}
-  function bars(id,rows,max){
-    var box=document.getElementById(id);max=max||Math.max.apply(null,rows.map(function(r){return r.v||0;}).concat([1]));
-    rows.forEach(function(r){
-      var row=el('div','bar-row');row.tabIndex=0;
-      row.setAttribute('aria-label',r.label+': '+fmt(r.v)+(r.detail?', '+r.detail:''));
-      row.appendChild(el('div',null,r.label));
-      var tr=el('div','bar-track'),b=el('div','bar'),w=Math.max(0,(r.v||0)/max*85);
-      b.style.width=w+'%';tr.appendChild(b);var val=el('span','bar-val',fmt(r.v));val.style.left=w+'%';tr.appendChild(val);row.appendChild(tr);
-      var lines=[fmt(r.v),r.label].concat(r.detail?[r.detail]:[]);
-      row.addEventListener('pointerenter',function(ev){show(row,lines);move(ev);});
-      row.addEventListener('pointermove',move);
-      row.addEventListener('pointerleave',function(){tip.style.display='none';});
-      row.addEventListener('focus',function(){show(row,lines);var b=row.getBoundingClientRect();tip.style.left=Math.min(b.left,window.innerWidth-300)+'px';tip.style.top=(b.bottom+6)+'px';});
-      row.addEventListener('blur',function(){tip.style.display='none';});
-      box.appendChild(row);
-    });
-  }
-  var SRC='https://raw.githubusercontent.com/healthtransformationlab/health-transformation-lab-nlp/main/docs/site/data-quality.json';
-  fetch(SRC).then(function(r){return r.json();}).then(function(d){
-    document.getElementById('note').textContent=d.note;
-    var pass=d.checks.filter(function(c){return c.status==='PASS';});
-    var passing=pass.filter(function(c){return c.n_fail===0;}).length;
-    var chart=d.completeness.filter(function(c){return c.part==='probing_chart';})[0];
-    [[d.visit_count.toLocaleString(),'synthetic visits, '+d.patient_count.toLocaleString()+' patients'],
-     [passing+' of '+pass.length,'pass/fail checks with no failures'],
-     [d.injected.caught_count+' of '+d.injected.injected_count,'planted charting errors caught'],
-     [fmt(chart.missing_pct),'of visits without a gum chart']].forEach(function(t){var x=el('div','tile');x.appendChild(el('b',null,t[0]));x.appendChild(el('span',null,t[1]));document.getElementById('tiles').appendChild(x);});
-    var tb=document.querySelector('#checks tbody');
-    d.checks.forEach(function(c){var tr=el('tr');
-      var s=c.status==='PASS'?(c.n_fail?'✓ Pass (few)':'✓ Pass'):'ⓘ Reported';
-      tr.appendChild(el('td','status '+(c.status==='PASS'?'pass':'report'),s));
-      tr.appendChild(el('td',null,c.label));
-      tr.appendChild(el('td','num',c.n_fail.toLocaleString()));tr.appendChild(el('td','num',c.n_checked.toLocaleString()));tr.appendChild(el('td','num',fmt(c.fail_pct)));tb.appendChild(tr);});
-    bars('missing',d.completeness.map(function(c){return {label:c.label,v:c.missing_pct,detail:'of '+c.n_rows.toLocaleString()+' visits'};}),100);
-    var parts=[],clin=[];d.by_clinic.forEach(function(r){if(parts.indexOf(r.label)<0)parts.push(r.label);if(clin.indexOf(r.clinic)<0)clin.push(r.clinic);});
-    var t=document.getElementById('clinics'),h=el('tr');h.appendChild(el('th',null,'Clinic'));parts.forEach(function(p){h.appendChild(el('th','num',p.replace(/^Visit has an? /,'No ')));});var th=el('thead');th.appendChild(h);t.appendChild(th);
-    var tbody=el('tbody');clin.forEach(function(cl){var tr=el('tr');tr.appendChild(el('td',null,'Clinic '+cl));parts.forEach(function(p){var r=d.by_clinic.filter(function(x){return x.clinic===cl&&x.label===p;})[0];tr.appendChild(el('td','num',r?fmt(r.missing_pct)+(r.is_outlier?' ⚠':''):'–'));});tbody.appendChild(tr);});t.appendChild(tbody);
-    var tm=d.temporal.slice(); /* each list sorted largest first */
-    bars('stagedrop',tm.sort(function(a,b){return b.stage_drop_pct-a.stage_drop_pct;}).map(function(m){return {label:m.label,v:m.stage_drop_pct,detail:'of '+m.n_later_visits.toLocaleString()+' later visits'};}));
-    bars('resolved',tm.slice().sort(function(a,b){return b.perio_resolved_pct-a.perio_resolved_pct;}).map(function(m){return {label:m.label,v:m.perio_resolved_pct,detail:'of '+m.n_later_visits.toLocaleString()+' later visits'};}));
-    document.getElementById('injected').textContent='Planted errors: the generator added '+d.injected.injected_count+' charting mistakes on purpose. The over-time checks catch '+d.injected.caught_count+' of them ('+fmt(d.injected.caught_pct)+'), and flag '+fmt(d.injected.false_flag_pct)+' of visits that had no planted mistake.';
-    bars('mess',d.open_dental.map(function(r){return {label:r.label,v:r.pct,detail:r.numerator.toLocaleString()+' of '+r.denominator.toLocaleString()};}),100);
-  }).catch(function(){document.getElementById('note').textContent='The data could not be loaded. Open the data file directly: '+SRC;});
-})();
+<div id="root" class="wrap"><p class="loading">Loading the data…</p></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.10/babel.min.js"></script>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect } = React;
+const SRC = "https://raw.githubusercontent.com/healthtransformationlab/health-transformation-lab-nlp/main/docs/site/data-quality.json";
+const CODE = "https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/python/health_transformation_lab_nlp/dq_site.py";
+const SCOPES = [{ id:"all_visits", label:"All visits" }, { id:"complete_cases", label:"Complete cases" }, { id:"reference_set", label:"Reference set (240)" }];
+// starting-point targets, to agree with the research team
+const STATUS_LABEL = { good:"Within target", warn:"Watch", crit:"Needs attention", none:"Not assessed" };
+const band = (v, good, warn, higherBetter) => v == null ? "none" : higherBetter ? (v >= good ? "good" : v >= warn ? "warn" : "crit") : (v <= good ? "good" : v <= warn ? "warn" : "crit");
+const fmt = (n, d=1) => n == null ? "—" : n.toLocaleString("en-US", { maximumFractionDigits:d, minimumFractionDigits: Number.isInteger(n) ? 0 : d });
+const seq = t => `var(${["--seq-100","--seq-200","--seq-300","--seq-400","--seq-500","--seq-600","--seq-700"][Math.min(6, Math.max(0, Math.round(t*6)))]})`;
+
+function useTip() {
+  const [tip, setTip] = useState(null);
+  const show = (e, content) => { const r = e.currentTarget.closest(".chart").getBoundingClientRect(); setTip({ x: e.clientX - r.left, y: e.clientY - r.top, content }); };
+  return [tip, show, () => setTip(null)];
+}
+const Tip = ({ tip }) => tip ? <div className="tip" style={{ left: tip.x, top: tip.y }}>{tip.content}</div> : null;
+
+function HBars({ rows, max = 100, unit = "%", flagAbove, w = 640, labelW = 230 }) {
+  const [tip, show, hide] = useTip();
+  const rowH = 24, plotW = w - labelW - 56, h = rows.length * rowH + 20;
+  return (<div className="chart"><svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label="Horizontal bar chart">
+    {[0,25,50,75,100].map(t => <g key={t} transform={`translate(${labelW + plotW*t/max},0)`}><line y1="0" y2={h-18} className="grid-line"/><text y={h-4} textAnchor="middle" className="axis-text">{t}{unit}</text></g>)}
+    {rows.map((r, i) => { const bw = Math.max(0, plotW * (r.v||0) / max), flagged = flagAbove != null && r.v > flagAbove;
+      return (<g key={r.k} transform={`translate(0,${i*rowH+4})`} tabIndex="0" aria-label={`${r.k}: ${fmt(r.v)}${unit}`}
+          onMouseMove={e => show(e, <span><b>{r.k}</b> · {fmt(r.v)}{unit}</span>)} onMouseLeave={hide}>
+        <rect x="0" y="0" width={w} height={rowH-4} fill="transparent"/>
+        <text x={labelW-10} y="13" textAnchor="end" className="lbl">{r.k}</text>
+        <rect x={labelW} y="2" width={bw} height={rowH-8} fill={flagged ? "var(--crit)" : "var(--accent)"}/>
+        <text x={labelW+bw+6} y="13" className="val">{fmt(r.v)}{unit}{flagged ? " ▲" : ""}</text></g>); })}
+    <line x1={labelW} x2={labelW} y1="0" y2={h-18} className="base"/></svg><Tip tip={tip}/></div>);
+}
+
+function Funnel({ steps }) {
+  const [tip, show, hide] = useTip();
+  const max = steps[0].visit_count || 1, w = 640, rowH = 30, labelW = 290, plotW = w - labelW - 80, h = steps.length * rowH;
+  return (<div className="chart"><svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label="Complete-case funnel">
+    {steps.map((s, i) => { const bw = plotW * s.visit_count / max, pct = 100 * s.visit_count / max;
+      return (<g key={s.label} transform={`translate(0,${i*rowH})`} onMouseMove={e => show(e, <span><b>{s.label}</b> · {s.visit_count.toLocaleString()} ({fmt(pct)}% of start)</span>)} onMouseLeave={hide}>
+        <rect width={w} height={rowH} fill="transparent"/><text x={labelW-10} y="19" textAnchor="end" className="lbl">{s.label}</text>
+        <rect x={labelW} y="6" width={bw} height={rowH-12} fill={i === steps.length-1 ? "var(--accent-ink)" : "var(--accent)"} opacity={1 - i*0.12}/>
+        <text x={labelW+bw+6} y="19" className="val">{s.visit_count.toLocaleString()}</text></g>); })}
+    <line x1={labelW} x2={labelW} y1="0" y2={h} className="base"/></svg><Tip tip={tip}/></div>);
+}
+
+function ClinicBars({ rows, overall, selected }) {
+  const [tip, show, hide] = useTip();
+  const w = 640, h = 190, padL = 36, padB = 34, padT = 10, plotW = w - padL - 10, plotH = h - padB - padT;
+  const max = 80, n = rows.length, slot = plotW / n, bw = Math.min(40, slot - 8), y = v => padT + plotH - plotH * v / max;
+  const vals = rows.map(r => r.periodontitis_pct), spread = Math.max(...vals) - Math.min(...vals);
+  return (<div className="chart"><svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label="Periodontitis prevalence by clinic">
+    {[0,20,40,60,80].map(t => <g key={t}><line x1={padL} x2={w-10} y1={y(t)} y2={y(t)} className="grid-line"/><text x={padL-6} y={y(t)+4} textAnchor="end" className="axis-text">{t}%</text></g>)}
+    {rows.map((r, i) => { const x = padL + slot*i + (slot-bw)/2, v = r.periodontitis_pct, dev = Math.abs(v - overall), sel = selected === r.clinic;
+      return (<g key={r.clinic} onMouseMove={e => show(e, <span><b>Clinic {r.clinic}</b> · {fmt(v)}% (95% CI {fmt(r.ci_low_pct)}–{fmt(r.ci_high_pct)}), {v >= overall ? "+" : "−"}{fmt(dev)} vs overall, {r.people_count} people</span>)} onMouseLeave={hide}>
+        <rect x={padL+slot*i} y={padT} width={slot} height={plotH} fill="transparent"/>
+        <rect x={x} y={y(v)} width={bw} height={plotH-(y(v)-padT)} fill={dev > 8 ? "var(--series-2)" : "var(--accent)"} stroke={sel ? "var(--ink)" : "none"} strokeWidth="2"/>
+        <line x1={x+bw/2} x2={x+bw/2} y1={y(r.ci_high_pct)} y2={y(r.ci_low_pct)} stroke="var(--ink)" strokeWidth="1.5"/>
+        <text x={x+bw/2} y={h-padB+14} textAnchor="middle" className="axis-text">{sel ? "▸ " : ""}Clinic {r.clinic}</text></g>); })}
+    <line x1={padL} x2={w-10} y1={y(overall)} y2={y(overall)} stroke="var(--ink)" strokeWidth="1.5" strokeDasharray="4 3"/>
+    <text x={w-12} y={y(overall)-5} textAnchor="end" className="val">overall {fmt(overall)}%</text>
+    <line x1={padL} x2={w-10} y1={y(0)} y2={y(0)} className="base"/></svg><Tip tip={tip}/>
+    <div className="legend"><span><i className="sw" style={{ background:"var(--accent)" }}></i>Within 8 pts of overall</span><span><i className="sw" style={{ background:"var(--series-2)" }}></i>More than 8 pts from overall</span><span>Lines: 95% intervals</span><span>Spread {fmt(spread)} pts</span></div></div>);
+}
+
+function Matrix({ labels, value, flagBelow }) {
+  return (<div className="twrap"><div className="matrix" style={{ gridTemplateColumns: `minmax(90px,auto) repeat(${labels.length}, minmax(56px,1fr))`, minWidth: 90 + labels.length*60 }}>
+    <div className="h"></div>{labels.map(l => <div className="h" key={l[0]}>{l[1]}</div>)}
+    {labels.map(a => (<React.Fragment key={a[0]}><div className="rh">{a[1]}</div>
+      {labels.map(b => { const diag = a[0] === b[0], v = diag ? null : value(a[0], b[0]); const flag = !diag && v != null && v < flagBelow;
+        return <div key={b[0]} className={`c ${diag ? "diag" : ""} ${flag ? "flag" : ""}`} title={diag ? "" : `${a[1]} × ${b[1]}: ${fmt(v)}% agree`}
+          style={diag || v == null ? {} : { background: seq(v/100), color: v/100 > 0.5 ? "#fff" : "var(--ink)" }}>{diag ? "—" : v == null ? "" : `${Math.round(v)}%`}</div>; })}
+    </React.Fragment>))}</div></div>);
+}
+
+function TransitionMatrix({ stages, value }) {
+  return (<div className="twrap"><div className="matrix" style={{ gridTemplateColumns: `minmax(90px,auto) repeat(${stages.length}, minmax(44px,1fr))`, minWidth: 90 + stages.length*50 }}>
+    <div className="h" style={{ justifyContent:"flex-start" }}>visit t ↓ / t+1 →</div>{stages.map(s => <div className="h" key={s[0]}>{s[1]}</div>)}
+    {stages.map((a, i) => (<React.Fragment key={a[0]}><div className="rh">{a[1]}</div>
+      {stages.map((b, j) => { const r = value(a[0], b[0]), v = r ? r.row_pct : 0, improved = j < i && v > 0;
+        return <div key={b[0]} className={`c ${improved ? "flag" : ""}`} title={`${a[1]} → ${b[1]}: ${fmt(v)}% of row, ${r ? r.pair_count : 0} visit pairs`}
+          style={{ background: seq(v/100), color: v/100 > 0.5 ? "#fff" : "var(--ink)" }}>{Math.round(v)}%</div>; })}
+    </React.Fragment>))}</div>
+    <div className="legend" style={{ marginTop:8 }}><span>Row % of visit pairs with that stage at visit t</span><span><i className="sw" style={{ boxShadow:"inset 0 0 0 2px var(--crit)", background:"transparent" }}></i>Below the diagonal = stage improved: a charting or rule error unless treated</span></div></div>);
+}
+
+function Tile({ eyebrow, domain, v, unit, def, status }) {
+  const cls = status === "none" ? "" : status;
+  return (<div className={`tile ${cls}`}><div className="eyebrow">{eyebrow}</div><div className="domain">{domain}</div>
+    <div className="value">{v == null ? "—" : fmt(v)}<small>{unit}</small></div><div className="def">{def}</div>
+    <span className={`pill ${cls}`} style={status === "none" ? { color:"var(--ink-3)", background:"var(--surface-2)" } : {}}>{STATUS_LABEL[status]}</span></div>);
+}
+function Panel({ eyebrow, title, rung, w, children, note }) {
+  return (<section className={`panel ${w || ""}`}><div className="phead"><div><div className="eyebrow">{eyebrow}</div><h2>{title}</h2></div>{rung && <span className="rung">{rung}</span>}</div>
+    {note && <p className="note">{note}</p>}{children}</section>);
+}
+const SectionH = ({ children, src }) => <div className="section-h"><h3>{children}</h3><div className="line"></div>{src && <span className="src">{src}</span>}</div>;
+
+function App({ d }) {
+  const S = d.sections;
+  const [clinic, setClinic] = useState("All");
+  const [scope, setScope] = useState("all_visits");
+  const m = S.monitor.find(x => x.clinic === clinic && x.scale === scope);
+  const clinics = ["All", ...S.prevalence_clinic.map(r => r.clinic)];
+  const people = S.prevalence_clinic.reduce((a, r) => a + r.people_count, 0);
+  const overall = S.prevalence_clinic.reduce((a, r) => a + r.periodontitis_pct * r.people_count, 0) / people;
+  const T = S.tiles;
+  const src = []; S.concordance.forEach(r => [[r.method_a, r.label_a], [r.method_b, r.label_b]].forEach(x => { if (!src.some(y => y[0] === x[0])) src.push(x); }));
+  const conc = (a, b) => { const r = S.concordance.find(x => (x.method_a === a && x.method_b === b) || (x.method_a === b && x.method_b === a)); return r ? r.agree_pct : null; };
+  const order = ["healthy_gingivitis","periodontitis_stage_1","periodontitis_stage_2","periodontitis_stage_3","periodontitis_stage_4"];
+  const stages = order.map(s => [s, (S.transitions.find(r => r.from_status === s) || {}).from_label || s]);
+  const trans = (a, b) => S.transitions.find(r => r.from_status === a && r.to_status === b);
+  const design = ["exam_form","proc_dx_completed","proc_dx_planned","notes","probing_chart"];
+  const cascade = design.map((c, i) => ({ n: i+1, row: m.truth.find(r => r.source === c) }));
+  return (<>
+    <a className="home" href="/"><b>H</b>← Back to home</a>
+    <header className="top"><div><h1>Perio Data Quality (DQ) Monitor</h1>
+      <div className="sub">Is a dental record fit for finding gum disease? NIH pragmatic-trials framework (Zozus) with Kahn and Liaw extensions</div></div>
+      <div className="meta"><span className="chip sample">Synthetic data · not clinical performance</span><span className="chip">{T.visit_count.toLocaleString()} visits</span><span className="chip">{T.clinic_count} clinics</span><span className="chip">Open Dental-shaped</span></div></header>
+    <div className="rail" role="toolbar" aria-label="Filters">
+      <label className="field">Clinic <select value={clinic} onChange={e => setClinic(e.target.value)}>{clinics.map(c => <option key={c} value={c}>{c === "All" ? "All clinics" : `Clinic ${c}`}</option>)}</select></label>
+      <div className="scope" role="group" aria-label="Level of scale">{SCOPES.map(s => <button key={s.id} aria-pressed={scope === s.id} onClick={() => setScope(s.id)}>{s.label}</button>)}</div>
+      <span className="field">{m.visit_count.toLocaleString()} visits in view</span>
+    </div>
+    <div className="tiles">
+      <Tile eyebrow="Zozus" domain="Completeness" v={m.completeness_pct} unit="% complete" def="Visits with exam form, diagnosis code and gum chart all present" status={band(m.completeness_pct, 80, 25, true)}/>
+      <Tile eyebrow="Zozus" domain="Accuracy" v={m.accuracy_pct} unit="% vs truth" def="Rules on the whole record, measurements first, against the synthetic truth" status={band(m.accuracy_pct, 85, 70, true)}/>
+      <Tile eyebrow="Zozus" domain="Consistency" v={T.consistency_pts} unit="pt spread" def={`Periodontitis prevalence range across the ${T.clinic_count} clinics`} status={band(T.consistency_pts, 10, 20, false)}/>
+      <Tile eyebrow="Kahn" domain="Temporal plausibility" v={T.implausible_pct} unit="% implausible" def="Visit pairs whose stage improved without treatment" status={band(T.implausible_pct, 5, 10, false)}/>
+      <Tile eyebrow="Liaw" domain="Reliability" v={null} unit="" def="Needs real reviewers staging the same records" status="none"/>
+    </div>
+    <div className="grid">
+      <SectionH src={`${clinic === "All" ? "All clinics" : "Clinic " + clinic} · ${SCOPES.find(s => s.id === scope).label}`}>Completeness</SectionH>
+      <Panel w="w8" eyebrow="Column data value completeness" title="Missingness by source" note="Share of visits where the source gives no status. Sources above 30% are flagged ▲.">
+        <HBars rows={m.missing.map(r => ({ k: r.label, v: r.missing_pct }))} flagAbove={30}/></Panel>
+      <Panel w="w4" eyebrow="Column completeness, every column" title="Missing by evidence column" note="All visits, all clinics, including the chart measurements.">
+        <div className="twrap"><table><thead><tr><th>Column</th><th className="num">Missing</th></tr></thead>
+          <tbody>{S.missingness.map(r => <tr key={r.column}><td className="k">{r.label}</td><td className="num">{fmt(r.missing_pct)}%</td></tr>)}</tbody></table></div></Panel>
+      <Panel w="w12" eyebrow="Row data value completeness" title="Complete-case funnel" note="Visits surviving each requirement. The last bar is the number of visits where every source can be compared.">
+        <Funnel steps={m.funnel}/></Panel>
+      <SectionH src="Hierarchy: truth → independent measurement">Accuracy</SectionH>
+      <Panel w="w6" eyebrow="Comparison to truth" title="Each source against the synthetic truth" rung="Hierarchy · rung 1"
+             note="Where the source gives a status. Agree = same status; sensitivity to NPV for periodontitis yes/no. The truth is the generator's: real records need reviewers.">
+        <div className="twrap"><table><thead><tr><th>Source</th><th className="num">n</th><th className="num">Agree</th><th className="num">Sens</th><th className="num">Spec</th><th className="num">PPV</th><th className="num">NPV</th></tr></thead>
+          <tbody>{m.truth.map(r => <tr key={r.source}><td className="k">{r.label}</td><td className="num">{r.answered_count.toLocaleString()}</td><td className="num">{fmt(r.agree_pct)}%</td>
+            <td className="num">{fmt(r.sensitivity_pct)}</td><td className="num">{fmt(r.specificity_pct)}</td><td className="num">{fmt(r.ppv_pct)}</td><td className="num">{fmt(r.npv_pct)}</td></tr>)}</tbody></table></div></Panel>
+      <Panel w="w6" eyebrow="Comparison to independent measurement" title="Concordance between sources" rung="Hierarchy · rung 2"
+             note="Pairwise agreement on status, truth excluded, all visits. Pairs under 65% are outlined.">
+        <Matrix labels={src} value={conc} flagBelow={65}/>
+        <div className="legend"><span>Agreement <span className="ramp">{[1,2,3,4,5,6,7].map(i => <i key={i} style={{ background: `var(--seq-${i*100})` }}></i>)}</span> 0 → 100%</span></div></Panel>
+      <SectionH src="Stratified by clinic">Consistency</SectionH>
+      <Panel w="w8" eyebrow="Site consistency" title="Periodontitis prevalence by clinic" note="Rules, exam form first, per person. Differences aren't errors by themselves; large gaps are worth a look as population, protocol or documentation effects. The scale filter doesn't apply here.">
+        <ClinicBars rows={S.prevalence_clinic} overall={overall} selected={clinic}/></Panel>
+      <Panel w="w4" eyebrow="Levels of scale" title="Prevalence by scale" note="Periodontitis share on each scale, by method.">
+        <div className="twrap"><table><thead><tr><th>Method</th><th>Scale</th><th className="num">Perio</th></tr></thead>
+          <tbody>{S.prevalence_scale.filter(r => ["algorithm_design","notes","probing_chart"].includes(r.method)).map(r => <tr key={r.method + r.scale}><td className="k">{r.label}</td><td>{r.scale.replace(/_/g, " ")}</td><td className="num">{fmt(r.periodontitis_pct)}%</td></tr>)}</tbody></table></div></Panel>
+      <SectionH src="Borrowed from Kahn et al. · Liaw et al.">Concepts from other frameworks</SectionH>
+      <Panel w="w6" eyebrow="Patient-level consistency · temporal plausibility" title="Stage at one visit and the next" rung="Kahn · temporal"
+             note="Rules, exam form first. Without treatment a stage should hold or worsen; movement below the diagonal is implausible.">
+        <TransitionMatrix stages={stages} value={trans}/>
+        <p className="note">Injected charting errors (synthetic only): {S.injected.injected_count} added on purpose; the temporal checks catch {S.injected.caught_count} ({fmt(S.injected.caught_pct)}%) and flag {fmt(S.injected.false_flag_pct, 2)}% of visits with none.</p></Panel>
+      <Panel w="w6" eyebrow="Temporal plausibility by method" title="Implausible change, per source" rung="Kahn · temporal" note="Visit pairs 1–2 years apart with no treatment between. Lower improved and resolved shares are more plausible.">
+        <div className="twrap"><table><thead><tr><th>Method</th><th className="num">Pairs</th><th className="num">Improved</th><th className="num">Resolved</th><th className="num">Stage drop</th></tr></thead>
+          <tbody>{S.temporal.map(r => <tr key={r.method}><td className="k">{r.label}</td><td className="num">{r.pair_count.toLocaleString()}</td><td className="num">{fmt(r.improved_pct)}%</td><td className="num">{fmt(r.resolved_pct)}%</td><td className="num">{fmt(r.stage_drop_pct)}%</td></tr>)}</tbody></table></div></Panel>
+      <Panel w="w12" eyebrow="Reliability" title="Not assessed" rung="Liaw · reliability">
+        <p className="note">Reliability needs real reviewers staging the same records, and their agreement with each other (<a href="../scoring/">how scoring works</a>). Simulated reviewers are a dry run and aren't shown.</p></Panel>
+      <SectionH src="Pragmatic-trials framework">Impact assessment</SectionH>
+      <Panel w="w12" eyebrow="Rule-based cascade" title="The study design's source order vs. observed accuracy" rung="Impact assessment"
+             note="The design draws from each source in order until a status is found. Where a later source agrees with the truth more often than the one before it, the order is worth revisiting.">
+        <div className="cascade">{cascade.map((c, i) => { const prev = cascade[i-1]; const reorder = prev && c.row.agree_pct > prev.row.agree_pct;
+          return (<div key={c.n} className={`step ${reorder ? "reorder" : ""}`}><span className="n">{String(c.n).padStart(2, "0")}</span>
+            <span><span className="t">{c.row.label}</span><br/><span className="d">{c.row.answered_count.toLocaleString()} visits with a status</span></span>
+            <span className="acc">{fmt(c.row.agree_pct)}% vs truth</span>
+            {reorder ? <span className="pill warn" style={{ marginTop:0 }}>Outranks step {prev.n}</span> : <span className="pill good" style={{ marginTop:0 }}>Order holds</span>}</div>); })}</div></Panel>
+      <SectionH src="Spec 029, the tooth-loss work">How messy the perio charts are</SectionH>
+      <Panel w="w12" eyebrow="Synthetic Open Dental extract · 2,000 patients" title="Chart messiness, measured the way a real extract would be" note="Counts only. Real rates come from running the same profile on a real extract.">
+        <HBars rows={S.open_dental.map(r => ({ k: r.label, v: r.pct }))} w={1000} labelW={380}/></Panel>
+    </div>
+    <p className="foot">Every number is computed from the project's committed synthetic data, by the same tables as its Databricks dashboard (<a href={CODE}>dq_site.py</a>; <a href={SRC}>data</a>). Status thresholds (completeness 80%/25%, accuracy 85%/70%, spread 10/20 points, implausible 5%/10%, missingness 30%, concordance 65%, 8-point clinic gap) are starting points to agree with a research team. Personal learning project, not affiliated with any employer or organization; the patients are synthetic. Hover any bar or cell for its value.</p>
+    <a className="home" href="/" style={{ marginTop:16 }}><b>H</b>← Back to home</a>
+  </>);
+}
+
+function Root() {
+  const [d, setD] = useState(null), [err, setErr] = useState(false);
+  useEffect(() => { fetch(SRC).then(r => r.json()).then(setD).catch(() => setErr(true)); }, []);
+  if (err) return <p className="loading">The data could not be loaded. Open it directly: <a href={SRC}>{SRC}</a></p>;
+  if (!d) return <p className="loading">Loading the data…</p>;
+  return <App d={d}/>;
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 </script>
-<footer>
-  <div class="wrap">
-    <p><b>Personal learning project.</b> Not affiliated with or endorsed by any employer, institution or vendor. The patients are synthetic. See the <a href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/DISCLAIMER.md">disclaimer</a>.</p>
-  </div>
-</footer>
 </body>
 </html>
