@@ -129,10 +129,11 @@
   .val { font-size: 12px; fill: var(--ink); font-family: var(--font-mono); font-weight: 500; }
   .grid-line { stroke: var(--hair); stroke-width: 1; }
   .base { stroke: var(--baseline); stroke-width: 1; }
-  .info { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; margin-left: 6px; padding: 0; vertical-align: middle; border-radius: 50%; border: 1.5px solid var(--accent); background: var(--surface); color: var(--accent-ink); font: italic 700 11px/1 Georgia, "Times New Roman", serif; cursor: pointer; position: relative; flex: none; text-transform: none; letter-spacing: 0; }
-  .info::after { content: ""; position: absolute; inset: -10px; }  /* a 38 px target for fingers */
-  .info:hover, .info[aria-expanded="true"] { background: var(--accent); color: #fff; }
-  .info:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .info { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; margin-left: 5px; padding: 0; vertical-align: -2px; border: 0; border-radius: 50%; background: transparent; color: var(--ink-3); cursor: pointer; position: relative; flex: none; opacity: 0.75; transition: color .15s, opacity .15s; }
+  .info svg { width: 15px; height: 15px; display: block; }
+  .info::after { content: ""; position: absolute; inset: -11px; }  /* a 38 px target for fingers */
+  .info:hover, .info[aria-expanded="true"] { color: var(--accent); opacity: 1; }
+  .info:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; opacity: 1; }
   .pop { position: fixed; z-index: 50; width: min(320px, calc(100vw - 32px)); background: var(--surface); color: var(--ink); border: 1px solid var(--hair); border-radius: 10px; box-shadow: 0 8px 28px rgba(0,0,0,0.18); padding: 12px 34px 12px 14px; font: 400 13px/1.5 var(--font-ui); text-align: left; }
   .pop b { display: block; font-weight: 600; margin-bottom: 4px; }
   .pop p { margin: 0 0 6px; }
@@ -149,6 +150,19 @@
   .clinics button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
   .clinics button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   @media (max-width: 640px) { .clinics { width: 100%; flex-wrap: wrap; overflow: visible; } .clinics .lbl { width: 100%; } .clinics button { min-width: 40px; padding: 0 10px; } .rail { gap: 10px; } }
+  .dd { position: relative; display: inline-flex; align-items: center; gap: 8px; }
+  .dd .lbl { font-size: 13px; color: var(--ink-2); }
+  .dd .ddw > button { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 210px; min-height: 38px; padding: 6px 12px; border: 1px solid var(--hair); border-radius: 8px; background: var(--surface); color: var(--ink); font: 500 14px var(--font-ui); cursor: pointer; text-align: left; }
+  .dd .ddw > button:hover, .dd > button[aria-expanded="true"] { border-color: var(--accent); }
+  .dd .ddw > button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .dd .caret { color: var(--ink-3); font-size: 11px; }
+  .dd ul { position: absolute; top: calc(100% + 6px); left: 0; z-index: 40; min-width: 100%; max-height: 320px; overflow-y: auto; margin: 0; padding: 6px; list-style: none; background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; box-shadow: 0 8px 28px rgba(0,0,0,0.16); }
+  .dd .ddw { position: relative; display: inline-flex; }
+  .dd li button { display: flex; width: 100%; align-items: center; gap: 8px; padding: 9px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--ink); font: 400 14px var(--font-ui); text-align: left; cursor: pointer; white-space: nowrap; }
+  .dd li button:hover, .dd li button:focus-visible { background: var(--surface-2); outline: none; }
+  .dd li button[aria-selected="true"] { font-weight: 600; color: var(--accent-ink); }
+  .dd li .tick { width: 14px; color: var(--accent); }
+  @media (max-width: 640px) { .dd { width: 100%; flex-wrap: wrap; } .dd .ddw { flex: 1; } .dd .ddw > button { flex: 1; min-width: 0; } .dd ul { left: 0; right: 0; } .dd li button { white-space: normal; padding: 12px 10px; } }
   .tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--page); font-size: 12px; padding: 6px 8px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, calc(-100% - 8px)); z-index: 5; font-family: var(--font-mono); }
   .tip b { font-family: var(--font-ui); font-weight: 600; }
 
@@ -280,7 +294,7 @@ function Info({ k }) {
              top: below ? r.bottom + 8 : null, bottom: below ? null : window.innerHeight - r.top + 8 });
   };
   return (<>
-    <button type="button" className="info" aria-label={`What does “${g.t}” mean?`} aria-expanded={!!pos} onClick={toggle}>i</button>
+    <button type="button" className="info" aria-label={`What does “${g.t}” mean?`} aria-expanded={!!pos} onClick={toggle}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.75"/><path d="M8 7.25v4" strokeLinecap="round"/><circle cx="8" cy="4.9" r="0.6" fill="currentColor" stroke="none"/></svg></button>
     {pos && ReactDOM.createPortal(
       <div className="pop" role="dialog" aria-label={g.t} onClick={e => e.stopPropagation()}
            style={{ left: pos.left, top: pos.top ?? "auto", bottom: pos.bottom ?? "auto" }}>
@@ -323,8 +337,8 @@ function ClinicBars({ rows, overall, selected }) {
     <div className="axis" aria-hidden="true"><div></div><div>{[0,20,40,60,80].map(t => <span key={t}>{t}%</span>)}</div></div>
     <div role="list">{rows.map(r => { const v = r.periodontitis_pct, dev = Math.abs(v - overall), sel = selected === r.clinic;
       return (<div className={`hb ${sel ? "sel" : ""}`} key={r.clinic} role="listitem" tabIndex="0"
-          title={`Clinic ${r.clinic}: ${fmt(v)}% (95% CI ${fmt(r.ci_low_pct)}–${fmt(r.ci_high_pct)}), ${v >= overall ? "+" : "−"}${fmt(dev)} vs overall, ${r.people_count} people`}>
-        <div className="lab">{sel ? "▸ " : ""}Clinic {r.clinic}</div>
+          title={`${r.name || "Clinic " + r.clinic}: ${fmt(v)}% (95% CI ${fmt(r.ci_low_pct)}–${fmt(r.ci_high_pct)}), ${v >= overall ? "+" : "−"}${fmt(dev)} vs overall, ${r.people_count} people`}>
+        <div className="lab">{sel ? "▸ " : ""}{r.name || `Clinic ${r.clinic}`}</div>
         <div className="trk"><div className="bar" style={{ width: x(v) + "%", background: dev > 8 ? "var(--series-2)" : "var(--accent)" }}></div>
           <div className="ci" style={{ left: x(r.ci_low_pct) + "%", width: (x(r.ci_high_pct) - x(r.ci_low_pct)) + "%" }}></div>
           <div className="ov" style={{ left: x(overall) + "%" }}></div>
@@ -356,7 +370,7 @@ function TransitionMatrix({ stages, value }) {
 
 function Tile({ eyebrow, domain, v, unit, def, status, src, info }) {
   const cls = status === "none" ? "" : status;
-  return (<div className={`tile ${cls}`}><div className="eyebrow">{eyebrow}<Info k={src}/></div><div className="domain">{domain}<Info k={info}/></div>
+  return (<div className={`tile ${cls}`}><div className="eyebrow">{eyebrow}</div><div className="domain">{domain}<Info k={info}/></div>
     <div className="value">{v == null ? "—" : fmt(v)}<small>{unit}</small></div><div className="def">{def}</div>
     <span className={`pill ${cls}`} style={status === "none" ? { color:"var(--ink-3)", background:"var(--surface-2)" } : {}}>{STATUS_LABEL[status]}</span></div>);
 }
@@ -366,18 +380,42 @@ function Panel({ eyebrow, title, rung, w, children, note, info, rungInfo }) {
 }
 const SectionH = ({ children, src, info }) => <div className="section-h"><h3>{children}{info && <Info k={info}/>}</h3><div className="line"></div>{src && <span className="src">{src}</span>}</div>;
 
+function Dropdown({ label, value, options, onChange }) {
+  // options: [[value, text]]; styled like the page, so phones don't open their own picker
+  const [open, setOpen] = useState(false);
+  const ref = React.useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const close = e => { if (e.type === "keydown" ? e.key === "Escape" : !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("click", close); document.addEventListener("keydown", close);
+    const sel = ref.current.querySelector('[aria-selected="true"]') || ref.current.querySelector("li button");
+    sel && sel.focus();
+    return () => { document.removeEventListener("click", close); document.removeEventListener("keydown", close); };
+  }, [open]);
+  const move = (e, i) => { const items = ref.current.querySelectorAll("li button");
+    if (e.key === "ArrowDown") { e.preventDefault(); items[Math.min(items.length - 1, i + 1)].focus(); }
+    if (e.key === "ArrowUp") { e.preventDefault(); items[Math.max(0, i - 1)].focus(); } };
+  const current = (options.find(o => o[0] === value) || options[0])[1];
+  return (<div className="dd" ref={ref}><span className="lbl">{label}</span>
+    <div className="ddw"><button type="button" aria-haspopup="listbox" aria-expanded={open} aria-label={`${label}: ${current}`} onClick={() => setOpen(o => !o)}>
+      <span>{current}</span><span className="caret" aria-hidden="true">▼</span></button>
+    {open && <ul role="listbox" aria-label={label}>{options.map(([v, t], i) =>
+      <li key={v}><button type="button" role="option" aria-selected={v === value} onKeyDown={e => move(e, i)}
+        onClick={() => { onChange(v); setOpen(false); }}><span className="tick" aria-hidden="true">{v === value ? "✓" : ""}</span>{t}</button></li>)}</ul>}
+  </div></div>);
+}
+
 const GROUP_TYPES = [["office","Office"],["provider","Provider"],["sex","Sex"],["race","Race"],["exam_year","Exam year"],["age_band","Age band"]];
 const GROUP_METRICS = [["no_margin_chart","No gum-margin readings"],["incomplete_chart","Incomplete in any way"]];
 function GroupPanel({ rows }) {
   const [type, setType] = useState("office");
   const [metric, setMetric] = useState("no_margin_chart");
   const sel = rows.filter(r => r.group_type === type && r.metric === metric);
-  const label = r => type === "office" ? `Office ${r.group}` : type === "provider" ? `Provider ${r.group}` : r.group;
+  const label = r => r.label || (type === "office" ? `Office ${r.group}` : type === "provider" ? `Provider ${r.group}` : r.group);
   const flagged = sel.filter(r => r.is_flagged).length;
   return (<Panel w="w12" eyebrow="Consistency by group · synthetic Open Dental extract" title="Is the perio chart kept as well for every group?" info="groups"
       note={`Share of each group's perio charts. ${flagged ? flagged + " flagged ▲ against the rest of its type." : "No group is flagged: on synthetic data every group is charted alike, as the generator makes it."}`}>
-    <div className="clinics" role="group" aria-label="Group by" style={{ marginBottom: 8 }}><span className="lbl">Group by</span>
-      {GROUP_TYPES.map(([id, l]) => <button key={id} type="button" aria-pressed={type === id} onClick={() => setType(id)}>{l}</button>)}</div>
+    <div style={{ marginBottom: 10 }}><Dropdown label="Group by" value={type} options={GROUP_TYPES} onChange={setType}/></div>
     <div className="scope" role="group" aria-label="Measure" style={{ marginBottom: 12 }}>
       {GROUP_METRICS.map(([id, l]) => <button key={id} aria-pressed={metric === id} onClick={() => setMetric(id)}>{l}</button>)}</div>
     <HBars rows={sel.map(r => ({ k: `${label(r)} (${r.chart_count.toLocaleString()})`, v: r.pct, flag: r.is_flagged }))}/>
@@ -401,6 +439,8 @@ function App({ d }) {
   const [scope, setScope] = useState("all_visits");
   const m = S.monitor.find(x => x.clinic === clinic && x.scale === scope);
   const clinics = ["All", ...S.prevalence_clinic.map(r => r.clinic)];
+  const NAMES = Object.fromEntries((S.clinics || S.prevalence_clinic.map(r => ({ clinic: r.clinic, name: `Clinic ${r.clinic}` }))).map(c => [c.clinic, c.name]));
+  const clinicName = c => c === "All" ? "All clinics" : NAMES[c] || `Clinic ${c}`;
   const people = S.prevalence_clinic.reduce((a, r) => a + r.people_count, 0);
   const overall = S.prevalence_clinic.reduce((a, r) => a + r.periodontitis_pct * r.people_count, 0) / people;
   const T = S.tiles;
@@ -417,8 +457,7 @@ function App({ d }) {
       <div className="sub">Is a dental record fit for finding gum disease? NIH pragmatic-trials framework<Info k="framework"/> (Zozus<Info k="zozus"/>) with Kahn<Info k="kahn"/> and de Vet<Info k="devet"/> extensions</div></div>
       <div className="meta"><span className="chip sample">Synthetic data · not clinical performance</span><span className="chip">{T.visit_count.toLocaleString()} visits</span><span className="chip">{T.clinic_count} clinics</span><span className="chip">Open Dental-shaped</span></div></header>
     <div className="rail" role="toolbar" aria-label="Filters">
-      <div className="clinics" role="group" aria-label="Clinic"><span className="lbl">Clinic</span>
-        {clinics.map(c => <button key={c} type="button" aria-pressed={clinic === c} aria-label={c === "All" ? "All clinics" : `Clinic ${c}`} onClick={() => setClinic(c)}>{c === "All" ? "All" : c}</button>)}</div>
+      <Dropdown label="Clinic" value={clinic} onChange={setClinic} options={clinics.map(c => [c, clinicName(c)])}/>
       <div className="scope" role="group" aria-label="Level of scale">{SCOPES.map(s => <button key={s.id} aria-pressed={scope === s.id} onClick={() => setScope(s.id)}>{s.label}</button>)}</div><Info k="scope"/>
       <span className="field">{m.visit_count.toLocaleString()} visits in view</span>
     </div>
@@ -430,7 +469,7 @@ function App({ d }) {
       <Tile eyebrow="de Vet" src="devet" info="reliability" domain="Reliability" v={null} unit="" def="Needs real reviewers staging the same records" status="none"/>
     </div>
     <div className="grid">
-      <SectionH src={`${clinic === "All" ? "All clinics" : "Clinic " + clinic} · ${SCOPES.find(s => s.id === scope).label}`} info="completeness">Completeness</SectionH>
+      <SectionH src={`${clinicName(clinic)} · ${SCOPES.find(s => s.id === scope).label}`} info="completeness">Completeness</SectionH>
       <Panel w="w8" eyebrow="Column data value completeness" title="Missingness by source" note="Share of visits where the source gives no status. Sources above 30% are flagged ▲.">
         <HBars rows={m.missing.map(r => ({ k: r.label, v: r.missing_pct }))} flagAbove={30}/></Panel>
       <Panel w="w4" eyebrow="Column completeness, every column" title="Missing by evidence column" note="All visits, all clinics, including the chart measurements.">
