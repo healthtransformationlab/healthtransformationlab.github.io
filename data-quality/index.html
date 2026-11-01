@@ -129,18 +129,20 @@
   .val { font-size: 12px; fill: var(--ink); font-family: var(--font-mono); font-weight: 500; }
   .grid-line { stroke: var(--hair); stroke-width: 1; }
   .base { stroke: var(--baseline); stroke-width: 1; }
-  .info { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; margin-left: 6px; padding: 0; vertical-align: middle; border-radius: 50%; border: 1.5px solid var(--accent); background: var(--surface); color: var(--accent-ink); font: italic 700 11px/1 Georgia, "Times New Roman", serif; cursor: pointer; position: relative; flex: none; text-transform: none; letter-spacing: 0; }
-  .info::after { content: ""; position: absolute; inset: -10px; }  /* a 38 px target for fingers */
-  .info:hover, .info[aria-expanded="true"] { background: var(--accent); color: #fff; }
-  .info:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .pop { position: fixed; z-index: 50; width: min(320px, calc(100vw - 32px)); background: var(--surface); color: var(--ink); border: 1px solid var(--hair); border-radius: 10px; box-shadow: 0 8px 28px rgba(0,0,0,0.18); padding: 12px 34px 12px 14px; font: 400 13px/1.5 var(--font-ui); text-align: left; }
+  .info { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; margin-left: 5px; padding: 0; vertical-align: -2px; border: 0; border-radius: 50%; background: transparent; color: var(--ink-3); cursor: pointer; position: relative; flex: none; opacity: 0.75; transition: color .15s, opacity .15s; }
+  .info svg { width: 15px; height: 15px; display: block; }
+  .info::after { content: ""; position: absolute; inset: -11px; }  /* a 38 px target for fingers */
+  .info:hover, .info[aria-expanded="true"] { color: var(--accent); opacity: 1; }
+  .info:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; opacity: 1; }
+  .pop { position: absolute; z-index: 50; width: min(320px, calc(100vw - 32px)); background: var(--surface); color: var(--ink); border: 1px solid var(--hair); border-radius: 10px; box-shadow: 0 8px 28px rgba(0,0,0,0.18); padding: 12px 34px 12px 14px; font: 400 13px/1.5 var(--font-ui); text-align: left; }
   .pop b { display: block; font-weight: 600; margin-bottom: 4px; }
   .pop p { margin: 0 0 6px; }
   .pop .cite { display: block; color: var(--ink-3); font-size: 12px; margin-top: 6px; }
   .pop .cite a { color: var(--accent-ink); }
   .pop .x { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border: 0; background: transparent; color: var(--ink-3); font-size: 18px; cursor: pointer; border-radius: 6px; }
   .pop .x:hover { background: var(--surface-2); }
-  @media (max-width: 640px) { .pop { left: 16px !important; right: 16px !important; top: auto !important; bottom: 16px !important; width: auto; } }
+  .pop::before { content: ""; position: absolute; top: -6px; left: var(--arrow, 50%); width: 10px; height: 10px; margin-left: -5px; background: var(--surface); border-left: 1px solid var(--hair); border-top: 1px solid var(--hair); transform: rotate(45deg); }
+  .pop.above::before { top: auto; bottom: -6px; transform: rotate(225deg); }
   .clinics { display: flex; align-items: center; gap: 6px; max-width: 100%; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding: 2px; }
   .clinics::-webkit-scrollbar { display: none; }
   .clinics .lbl { font-size: 13px; color: var(--ink-2); margin-right: 2px; flex: none; }
@@ -149,6 +151,19 @@
   .clinics button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
   .clinics button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   @media (max-width: 640px) { .clinics { width: 100%; flex-wrap: wrap; overflow: visible; } .clinics .lbl { width: 100%; } .clinics button { min-width: 40px; padding: 0 10px; } .rail { gap: 10px; } }
+  .dd { position: relative; display: inline-flex; align-items: center; gap: 8px; }
+  .dd .lbl { font-size: 13px; color: var(--ink-2); }
+  .dd .ddw > button { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 210px; min-height: 38px; padding: 6px 12px; border: 1px solid var(--hair); border-radius: 8px; background: var(--surface); color: var(--ink); font: 500 14px var(--font-ui); cursor: pointer; text-align: left; }
+  .dd .ddw > button:hover, .dd > button[aria-expanded="true"] { border-color: var(--accent); }
+  .dd .ddw > button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .dd .caret { color: var(--ink-3); font-size: 11px; }
+  .dd ul { position: absolute; top: calc(100% + 6px); left: 0; z-index: 40; min-width: 100%; max-height: 320px; overflow-y: auto; margin: 0; padding: 6px; list-style: none; background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; box-shadow: 0 8px 28px rgba(0,0,0,0.16); }
+  .dd .ddw { position: relative; display: inline-flex; }
+  .dd li button { display: flex; width: 100%; align-items: center; gap: 8px; padding: 9px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--ink); font: 400 14px var(--font-ui); text-align: left; cursor: pointer; white-space: nowrap; }
+  .dd li button:hover, .dd li button:focus-visible { background: var(--surface-2); outline: none; }
+  .dd li button[aria-selected="true"] { font-weight: 600; color: var(--accent-ink); }
+  .dd li .tick { width: 14px; color: var(--accent); }
+  @media (max-width: 640px) { .dd { width: 100%; flex-wrap: wrap; } .dd .ddw { flex: 1; } .dd .ddw > button { flex: 1; min-width: 0; } .dd ul { left: 0; right: 0; } .dd li button { white-space: normal; padding: 12px 10px; } }
   .tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--page); font-size: 12px; padding: 6px 8px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, calc(-100% - 8px)); z-index: 5; font-family: var(--font-mono); }
   .tip b { font-family: var(--font-ui); font-weight: 600; }
 
@@ -252,37 +267,52 @@ const GLOSS = {
   rung2: { t: "Accuracy hierarchy, rung 2", d: <>The next-best check when no true answer exists: compare two independent parts of the record that should say the same thing, like the gum chart and the diagnosis code. Low agreement means at least one of them is often off.</>, c: ZOZUS },
   agree: { t: "Agree, Sens, Spec, PPV, NPV", d: <><b style={{display:"inline"}}>Agree:</b> same status as the truth. The other four treat it as yes/no, gum disease or not. <b style={{display:"inline"}}>Sens</b>itivity: of people who have it, the share the source catches. <b style={{display:"inline"}}>Spec</b>ificity: of people who don't, the share it correctly leaves out. <b style={{display:"inline"}}>PPV</b>: when it says yes, how often that's right. <b style={{display:"inline"}}>NPV</b>: when it says no, how often that's right.</> },
   concordance: { t: "Concordance", d: <>How often two sources give the same status for the same visit, without looking at the truth. Darker means they agree more.</> },
+  groups: { t: "Kept as well for every group?", d: <>The study lead reads consistency as bias: is the record kept as well for every group of patients? For each office, provider, sex, race, exam year and age band, this shows the share of its perio charts with no gum-margin readings (so no attachment loss), or incomplete in any way. A group is flagged ▲ when it sits more than 2 SD from the other groups of its type and at least 5 points away; groups under 30 charts are shown but never flagged. The groups are provisional until the study lead names his.</>, c: <>After Kookal et al., J Public Health Dent 2024 (<a href="https://doi.org/10.1111/jphd.12618" target="_blank" rel="noopener">doi</a>), who compared offices with the mean of all offices</> },
+  checks: { t: "Extract checks", d: <>The checks Kookal et al. ran on a dental record extract, adapted to Open Dental's tables: is every column there, are values in range and in the right code lists, are keys and rows duplicated, and do plan copies still match their procedure. Each reports what it found; nothing is fixed. On this synthetic extract they find only what the generator puts in on purpose.</>, c: <>Kookal et al., J Public Health Dent 2024 (<a href="https://doi.org/10.1111/jphd.12618" target="_blank" rel="noopener">doi</a>)</> },
   impact: { t: "Impact assessment", d: <>Do the data problems change the answer? Here: the study design reads the sources in a fixed order. If a later source is more accurate than an earlier one, the order may be costing accuracy.</> },
   messiness: { t: "Chart messiness", d: <>How often a perio chart is partial, has unread teeth or is charted somewhere else, counted on the synthetic Open Dental extract the way they would be on a real one.</> },
 };
 
 function Info({ k }) {
+  // the pop-up sits next to its icon: below it, or above when there is no room, with a pointer to the icon; it
+  // scrolls with the page like the icon does
   const g = GLOSS[k];
-  const [pos, setPos] = useState(null);
+  const [at, setAt] = useState(null);          // the icon's box when opened (page coordinates)
+  const [place, setPlace] = useState(null);    // where the pop-up goes, once measured
+  const pop = React.useRef(null);
   useEffect(() => {
-    if (!pos) return;
-    const close = e => { if (e.type === "keydown" ? e.key === "Escape" : !e.target.closest(".pop")) setPos(null); };
-    const others = e => { if (e.detail !== k) setPos(null); };
+    if (!at) return;
+    const close = e => { if (e.type === "keydown" ? e.key === "Escape" : !e.target.closest(".pop")) setAt(null); };
+    const others = e => { if (e.detail !== k) setAt(null); };
+    const resize = () => setAt(null);
     document.addEventListener("click", close); document.addEventListener("keydown", close);
-    window.addEventListener("scroll", close, { passive: true }); document.addEventListener("info-open", others);
+    document.addEventListener("info-open", others); window.addEventListener("resize", resize);
     return () => { document.removeEventListener("click", close); document.removeEventListener("keydown", close);
-      window.removeEventListener("scroll", close); document.removeEventListener("info-open", others); };
-  }, [pos]);
+      document.removeEventListener("info-open", others); window.removeEventListener("resize", resize); };
+  }, [at]);
+  React.useLayoutEffect(() => {
+    if (!at || !pop.current) { setPlace(null); return; }
+    const vw = document.documentElement.clientWidth, w = pop.current.offsetWidth, h = pop.current.offsetHeight;
+    const cx = at.left + at.width / 2, gap = 10;
+    const left = Math.max(window.scrollX + 12, Math.min(cx - w / 2, window.scrollX + vw - w - 12));
+    const roomBelow = window.scrollY + window.innerHeight - (at.top + at.height);
+    const above = roomBelow < h + gap + 8 && at.top - window.scrollY > h + gap + 8;
+    setPlace({ left, top: above ? at.top - gap - h : at.top + at.height + gap, above,
+               arrow: Math.max(14, Math.min(cx - left, w - 14)) });
+  }, [at]);
   const toggle = e => {
     e.stopPropagation();
-    if (pos) return setPos(null);
-    const r = e.currentTarget.getBoundingClientRect(), w = Math.min(320, window.innerWidth - 32);
-    const below = r.bottom + 8 + 220 < window.innerHeight;
+    if (at) return setAt(null);
+    const r = e.currentTarget.getBoundingClientRect();
     document.dispatchEvent(new CustomEvent("info-open", { detail: k }));
-    setPos({ left: Math.max(16, Math.min(r.left - w / 2 + r.width / 2, window.innerWidth - w - 16)),
-             top: below ? r.bottom + 8 : null, bottom: below ? null : window.innerHeight - r.top + 8 });
+    setAt({ left: r.left + window.scrollX, top: r.top + window.scrollY, width: r.width, height: r.height });
   };
   return (<>
-    <button type="button" className="info" aria-label={`What does “${g.t}” mean?`} aria-expanded={!!pos} onClick={toggle}>i</button>
-    {pos && ReactDOM.createPortal(
-      <div className="pop" role="dialog" aria-label={g.t} onClick={e => e.stopPropagation()}
-           style={{ left: pos.left, top: pos.top ?? "auto", bottom: pos.bottom ?? "auto" }}>
-        <button type="button" className="x" aria-label="Close" onClick={() => setPos(null)}>×</button>
+    <button type="button" className="info" aria-label={`What does “${g.t}” mean?`} aria-expanded={!!at} onClick={toggle}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.75"/><path d="M8 7.25v4" strokeLinecap="round"/><circle cx="8" cy="4.9" r="0.6" fill="currentColor" stroke="none"/></svg></button>
+    {at && ReactDOM.createPortal(
+      <div ref={pop} className={`pop ${place && place.above ? "above" : ""}`} role="dialog" aria-label={g.t} onClick={e => e.stopPropagation()}
+           style={place ? { left: place.left, top: place.top, "--arrow": place.arrow + "px" } : { left: 0, top: 0, visibility: "hidden" }}>
+        <button type="button" className="x" aria-label="Close" onClick={() => setAt(null)}>×</button>
         <b>{g.t}</b><p>{g.d}</p>{g.c && <span className="cite">Source: {g.c}</span>}</div>, document.body)}
   </>);
 }
@@ -296,8 +326,8 @@ const Tip = ({ tip }) => tip ? <div className="tip" style={{ left: tip.x, top: t
 
 function HBars({ rows, max = 100, unit = "%", flagAbove }) {
   return (<div role="list">
-    <div className="axis" aria-hidden="true"><div></div><div>{[0,25,50,75,100].map(t => <span key={t}>{t}{unit}</span>)}</div></div>
-    {rows.map(r => { const pct = Math.max(0, Math.min(100, 100 * (r.v || 0) / max)), flagged = flagAbove != null && r.v > flagAbove;
+    <div className="axis" aria-hidden="true"><div></div><div>{[0,25,50,75,100].map(t => <span key={t}>{Math.round(t * max / 100)}{unit}</span>)}</div></div>
+    {rows.map(r => { const pct = Math.max(0, Math.min(100, 100 * (r.v || 0) / max)), flagged = r.flag != null ? r.flag : flagAbove != null && r.v > flagAbove;
       return (<div className="hb" key={r.k} role="listitem" tabIndex="0" title={`${r.k}: ${fmt(r.v)}${unit}`} aria-label={`${r.k}: ${fmt(r.v)}${unit}`}>
         <div className="lab">{r.k}</div>
         <div className="trk"><div className="bar" style={{ width: pct + "%", background: flagged ? "var(--crit)" : "var(--accent)" }}></div>
@@ -321,8 +351,8 @@ function ClinicBars({ rows, overall, selected }) {
     <div className="axis" aria-hidden="true"><div></div><div>{[0,20,40,60,80].map(t => <span key={t}>{t}%</span>)}</div></div>
     <div role="list">{rows.map(r => { const v = r.periodontitis_pct, dev = Math.abs(v - overall), sel = selected === r.clinic;
       return (<div className={`hb ${sel ? "sel" : ""}`} key={r.clinic} role="listitem" tabIndex="0"
-          title={`Clinic ${r.clinic}: ${fmt(v)}% (95% CI ${fmt(r.ci_low_pct)}–${fmt(r.ci_high_pct)}), ${v >= overall ? "+" : "−"}${fmt(dev)} vs overall, ${r.people_count} people`}>
-        <div className="lab">{sel ? "▸ " : ""}Clinic {r.clinic}</div>
+          title={`${r.name || "Clinic " + r.clinic}: ${fmt(v)}% (95% CI ${fmt(r.ci_low_pct)}–${fmt(r.ci_high_pct)}), ${v >= overall ? "+" : "−"}${fmt(dev)} vs overall, ${r.people_count} people`}>
+        <div className="lab">{sel ? "▸ " : ""}{r.name || `Clinic ${r.clinic}`}</div>
         <div className="trk"><div className="bar" style={{ width: x(v) + "%", background: dev > 8 ? "var(--series-2)" : "var(--accent)" }}></div>
           <div className="ci" style={{ left: x(r.ci_low_pct) + "%", width: (x(r.ci_high_pct) - x(r.ci_low_pct)) + "%" }}></div>
           <div className="ov" style={{ left: x(overall) + "%" }}></div>
@@ -354,7 +384,7 @@ function TransitionMatrix({ stages, value }) {
 
 function Tile({ eyebrow, domain, v, unit, def, status, src, info }) {
   const cls = status === "none" ? "" : status;
-  return (<div className={`tile ${cls}`}><div className="eyebrow">{eyebrow}<Info k={src}/></div><div className="domain">{domain}<Info k={info}/></div>
+  return (<div className={`tile ${cls}`}><div className="eyebrow">{eyebrow}</div><div className="domain">{domain}<Info k={info}/></div>
     <div className="value">{v == null ? "—" : fmt(v)}<small>{unit}</small></div><div className="def">{def}</div>
     <span className={`pill ${cls}`} style={status === "none" ? { color:"var(--ink-3)", background:"var(--surface-2)" } : {}}>{STATUS_LABEL[status]}</span></div>);
 }
@@ -364,12 +394,67 @@ function Panel({ eyebrow, title, rung, w, children, note, info, rungInfo }) {
 }
 const SectionH = ({ children, src, info }) => <div className="section-h"><h3>{children}{info && <Info k={info}/>}</h3><div className="line"></div>{src && <span className="src">{src}</span>}</div>;
 
+function Dropdown({ label, value, options, onChange }) {
+  // options: [[value, text]]; styled like the page, so phones don't open their own picker
+  const [open, setOpen] = useState(false);
+  const ref = React.useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const close = e => { if (e.type === "keydown" ? e.key === "Escape" : !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("click", close); document.addEventListener("keydown", close);
+    const sel = ref.current.querySelector('[aria-selected="true"]') || ref.current.querySelector("li button");
+    sel && sel.focus();
+    return () => { document.removeEventListener("click", close); document.removeEventListener("keydown", close); };
+  }, [open]);
+  const move = (e, i) => { const items = ref.current.querySelectorAll("li button");
+    if (e.key === "ArrowDown") { e.preventDefault(); items[Math.min(items.length - 1, i + 1)].focus(); }
+    if (e.key === "ArrowUp") { e.preventDefault(); items[Math.max(0, i - 1)].focus(); } };
+  const current = (options.find(o => o[0] === value) || options[0])[1];
+  return (<div className="dd" ref={ref}><span className="lbl">{label}</span>
+    <div className="ddw"><button type="button" aria-haspopup="listbox" aria-expanded={open} aria-label={`${label}: ${current}`} onClick={() => setOpen(o => !o)}>
+      <span>{current}</span><span className="caret" aria-hidden="true">▼</span></button>
+    {open && <ul role="listbox" aria-label={label}>{options.map(([v, t], i) =>
+      <li key={v}><button type="button" role="option" aria-selected={v === value} onKeyDown={e => move(e, i)}
+        onClick={() => { onChange(v); setOpen(false); }}><span className="tick" aria-hidden="true">{v === value ? "✓" : ""}</span>{t}</button></li>)}</ul>}
+  </div></div>);
+}
+
+const GROUP_TYPES = [["office","Office"],["provider","Provider"],["sex","Sex"],["race","Race"],["exam_year","Exam year"],["age_band","Age band"]];
+const GROUP_METRICS = [["no_margin_chart","No gum-margin readings"],["incomplete_chart","Incomplete in any way"]];
+function GroupPanel({ rows }) {
+  const [type, setType] = useState("office");
+  const [metric, setMetric] = useState("no_margin_chart");
+  const sel = rows.filter(r => r.group_type === type && r.metric === metric);
+  const label = r => r.label || (type === "office" ? `Office ${r.group}` : type === "provider" ? `Provider ${r.group}` : r.group);
+  const flagged = sel.filter(r => r.is_flagged).length;
+  return (<Panel w="w12" eyebrow="Consistency by group · synthetic Open Dental extract" title="Is the perio chart kept as well for every group?" info="groups"
+      note={`Share of each group's perio charts. ${flagged ? flagged + " flagged ▲ against the rest of its type." : "No group is flagged: on synthetic data every group is charted alike, as the generator makes it."}`}>
+    <div style={{ marginBottom: 10 }}><Dropdown label="Group by" value={type} options={GROUP_TYPES} onChange={setType}/></div>
+    <div className="scope" role="group" aria-label="Measure" style={{ marginBottom: 12 }}>
+      {GROUP_METRICS.map(([id, l]) => <button key={id} aria-pressed={metric === id} onClick={() => setMetric(id)}>{l}</button>)}</div>
+    <HBars rows={sel.map(r => ({ k: `${label(r)} (${r.chart_count.toLocaleString()})`, v: r.pct, flag: r.is_flagged }))}/>
+  </Panel>);
+}
+function ChecksPanel({ rows }) {
+  const DOMAIN = { completeness: "Completeness", accuracy: "Accuracy", plan_copy: "Plan copies", list_in_use: "List in use", consistency: "Consistency" };
+  return (<Panel w="w12" eyebrow="After Kookal et al. 2024 · synthetic Open Dental extract" title="Extract checks" info="checks"
+      note="Found = rows, cells or offices the check found. Flagged when anything is found; the missing-value share is reported, not flagged.">
+    <div className="twrap"><table><thead><tr><th>Check</th><th className="num">Found</th><th>Status</th></tr></thead>
+      <tbody>{rows.map(r => <tr key={r.check}><td className="k"><span style={{ display:"block", fontSize:11, color:"var(--ink-3)", textTransform:"uppercase", letterSpacing:"0.06em" }}>{DOMAIN[r.domain] || r.domain}</span>{r.text}</td>
+        <td className="num" title={`${fmt(r.found_pct, 2)}% of ${r.checked_count.toLocaleString()} checked`}>{r.found_count.toLocaleString()}<span style={{ display:"block", fontSize:11, color:"var(--ink-3)" }}>of {r.checked_count.toLocaleString()}</span></td>
+        <td>{r.is_flagged == null ? <span className="pill" style={{ color:"var(--ink-3)", background:"var(--surface-2)", marginTop:0 }}>Reported</span>
+          : r.is_flagged ? <span className="pill warn" style={{ marginTop:0 }}>Found</span> : <span className="pill good" style={{ marginTop:0 }}>None found</span>}</td></tr>)}</tbody></table></div>
+  </Panel>);
+}
+
 function App({ d }) {
   const S = d.sections;
   const [clinic, setClinic] = useState("All");
   const [scope, setScope] = useState("all_visits");
   const m = S.monitor.find(x => x.clinic === clinic && x.scale === scope);
   const clinics = ["All", ...S.prevalence_clinic.map(r => r.clinic)];
+  const NAMES = Object.fromEntries((S.clinics || S.prevalence_clinic.map(r => ({ clinic: r.clinic, name: `Clinic ${r.clinic}` }))).map(c => [c.clinic, c.name]));
+  const clinicName = c => c === "All" ? "All clinics" : NAMES[c] || `Clinic ${c}`;
   const people = S.prevalence_clinic.reduce((a, r) => a + r.people_count, 0);
   const overall = S.prevalence_clinic.reduce((a, r) => a + r.periodontitis_pct * r.people_count, 0) / people;
   const T = S.tiles;
@@ -386,8 +471,7 @@ function App({ d }) {
       <div className="sub">Is a dental record fit for finding gum disease? NIH pragmatic-trials framework<Info k="framework"/> (Zozus<Info k="zozus"/>) with Kahn<Info k="kahn"/> and de Vet<Info k="devet"/> extensions</div></div>
       <div className="meta"><span className="chip sample">Synthetic data · not clinical performance</span><span className="chip">{T.visit_count.toLocaleString()} visits</span><span className="chip">{T.clinic_count} clinics</span><span className="chip">Open Dental-shaped</span></div></header>
     <div className="rail" role="toolbar" aria-label="Filters">
-      <div className="clinics" role="group" aria-label="Clinic"><span className="lbl">Clinic</span>
-        {clinics.map(c => <button key={c} type="button" aria-pressed={clinic === c} aria-label={c === "All" ? "All clinics" : `Clinic ${c}`} onClick={() => setClinic(c)}>{c === "All" ? "All" : c}</button>)}</div>
+      <Dropdown label="Clinic" value={clinic} onChange={setClinic} options={clinics.map(c => [c, clinicName(c)])}/>
       <div className="scope" role="group" aria-label="Level of scale">{SCOPES.map(s => <button key={s.id} aria-pressed={scope === s.id} onClick={() => setScope(s.id)}>{s.label}</button>)}</div><Info k="scope"/>
       <span className="field">{m.visit_count.toLocaleString()} visits in view</span>
     </div>
@@ -399,7 +483,7 @@ function App({ d }) {
       <Tile eyebrow="de Vet" src="devet" info="reliability" domain="Reliability" v={null} unit="" def="Needs real reviewers staging the same records" status="none"/>
     </div>
     <div className="grid">
-      <SectionH src={`${clinic === "All" ? "All clinics" : "Clinic " + clinic} · ${SCOPES.find(s => s.id === scope).label}`} info="completeness">Completeness</SectionH>
+      <SectionH src={`${clinicName(clinic)} · ${SCOPES.find(s => s.id === scope).label}`} info="completeness">Completeness</SectionH>
       <Panel w="w8" eyebrow="Column data value completeness" title="Missingness by source" note="Share of visits where the source gives no status. Sources above 30% are flagged ▲.">
         <HBars rows={m.missing.map(r => ({ k: r.label, v: r.missing_pct }))} flagAbove={30}/></Panel>
       <Panel w="w4" eyebrow="Column completeness, every column" title="Missing by evidence column" note="All visits, all clinics, including the chart measurements.">
@@ -444,6 +528,8 @@ function App({ d }) {
       <SectionH src="Spec 029, the tooth-loss work">How messy the perio charts are</SectionH>
       <Panel w="w12" eyebrow="Synthetic Open Dental extract · 2,000 patients" title="Chart messiness, measured the way a real extract would be" info="messiness" note="Counts only. Real rates come from running the same profile on a real extract.">
         <HBars rows={S.open_dental.map(r => ({ k: r.label, v: r.pct }))}/></Panel>
+      {S.chart_by_group && <GroupPanel rows={S.chart_by_group}/>}
+      {S.extract_checks && <ChecksPanel rows={S.extract_checks}/>}
     </div>
     <p className="foot">Every number is computed from the project's committed synthetic data, by the same tables as its Databricks dashboard (<a href={CODE}>dq_site.py</a>; <a href={SRC}>data</a>). Status thresholds (completeness 80%/25%, accuracy 85%/70%, spread 10/20 points, implausible 5%/10%, missingness 30%, concordance 65%, 8-point clinic gap) are starting points to agree with a research team. Personal learning project, not affiliated with any employer or organization; the patients are synthetic. Hover any bar or cell for its value.</p>
     <a className="home" href="/" style={{ marginTop:16 }}><b>H</b>← Back to home</a>
