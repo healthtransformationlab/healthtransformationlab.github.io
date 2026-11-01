@@ -473,7 +473,7 @@ function App({ d }) {
     <div className="rail" role="toolbar" aria-label="Filters">
       <Dropdown label="Clinic" value={clinic} onChange={setClinic} options={clinics.map(c => [c, clinicName(c)])}/>
       <div className="scope" role="group" aria-label="Level of scale">{SCOPES.map(s => <button key={s.id} aria-pressed={scope === s.id} onClick={() => setScope(s.id)}>{s.label}</button>)}</div><Info k="scope"/>
-      <span className="field">{m.visit_count.toLocaleString()} visits in view</span>
+      <span className="field">{m.visit_count.toLocaleString()} {({ all_visits: "visits", complete_cases: "complete cases (visits with every source present)", reference_set: "reference-set visits (the charts every method is scored on)" })[scope]} · {clinic === "All" ? "all clinics" : clinicName(clinic)}</span>
     </div>
     <div className="tiles">
       <Tile eyebrow="Zozus" src="zozus" info="completeness" domain="Completeness" v={m.completeness_pct} unit="% complete" def="Visits with exam form, diagnosis code and gum chart all present" status={band(m.completeness_pct, 80, 25, true)}/>
