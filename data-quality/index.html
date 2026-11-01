@@ -252,6 +252,8 @@ const GLOSS = {
   rung2: { t: "Accuracy hierarchy, rung 2", d: <>The next-best check when no true answer exists: compare two independent parts of the record that should say the same thing, like the gum chart and the diagnosis code. Low agreement means at least one of them is often off.</>, c: ZOZUS },
   agree: { t: "Agree, Sens, Spec, PPV, NPV", d: <><b style={{display:"inline"}}>Agree:</b> same status as the truth. The other four treat it as yes/no, gum disease or not. <b style={{display:"inline"}}>Sens</b>itivity: of people who have it, the share the source catches. <b style={{display:"inline"}}>Spec</b>ificity: of people who don't, the share it correctly leaves out. <b style={{display:"inline"}}>PPV</b>: when it says yes, how often that's right. <b style={{display:"inline"}}>NPV</b>: when it says no, how often that's right.</> },
   concordance: { t: "Concordance", d: <>How often two sources give the same status for the same visit, without looking at the truth. Darker means they agree more.</> },
+  groups: { t: "Kept as well for every group?", d: <>The study lead reads consistency as bias: is the record kept as well for every group of patients? For each office, provider, sex, race, exam year and age band, this shows the share of its perio charts with no gum-margin readings (so no attachment loss), or incomplete in any way. A group is flagged ▲ when it sits more than 2 SD from the other groups of its type and at least 5 points away; groups under 30 charts are shown but never flagged. The groups are provisional until the study lead names his.</>, c: <>After Kookal et al., J Public Health Dent 2024 (<a href="https://doi.org/10.1111/jphd.12618" target="_blank" rel="noopener">doi</a>), who compared offices with the mean of all offices</> },
+  checks: { t: "Extract checks", d: <>The checks Kookal et al. ran on a dental record extract, adapted to Open Dental's tables: is every column there, are values in range and in the right code lists, are keys and rows duplicated, and do plan copies still match their procedure. Each reports what it found; nothing is fixed. On this synthetic extract they find only what the generator puts in on purpose.</>, c: <>Kookal et al., J Public Health Dent 2024 (<a href="https://doi.org/10.1111/jphd.12618" target="_blank" rel="noopener">doi</a>)</> },
   impact: { t: "Impact assessment", d: <>Do the data problems change the answer? Here: the study design reads the sources in a fixed order. If a later source is more accurate than an earlier one, the order may be costing accuracy.</> },
   messiness: { t: "Chart messiness", d: <>How often a perio chart is partial, has unread teeth or is charted somewhere else, counted on the synthetic Open Dental extract the way they would be on a real one.</> },
 };
@@ -296,8 +298,8 @@ const Tip = ({ tip }) => tip ? <div className="tip" style={{ left: tip.x, top: t
 
 function HBars({ rows, max = 100, unit = "%", flagAbove }) {
   return (<div role="list">
-    <div className="axis" aria-hidden="true"><div></div><div>{[0,25,50,75,100].map(t => <span key={t}>{t}{unit}</span>)}</div></div>
-    {rows.map(r => { const pct = Math.max(0, Math.min(100, 100 * (r.v || 0) / max)), flagged = flagAbove != null && r.v > flagAbove;
+    <div className="axis" aria-hidden="true"><div></div><div>{[0,25,50,75,100].map(t => <span key={t}>{Math.round(t * max / 100)}{unit}</span>)}</div></div>
+    {rows.map(r => { const pct = Math.max(0, Math.min(100, 100 * (r.v || 0) / max)), flagged = r.flag != null ? r.flag : flagAbove != null && r.v > flagAbove;
       return (<div className="hb" key={r.k} role="listitem" tabIndex="0" title={`${r.k}: ${fmt(r.v)}${unit}`} aria-label={`${r.k}: ${fmt(r.v)}${unit}`}>
         <div className="lab">{r.k}</div>
         <div className="trk"><div className="bar" style={{ width: pct + "%", background: flagged ? "var(--crit)" : "var(--accent)" }}></div>
@@ -363,6 +365,35 @@ function Panel({ eyebrow, title, rung, w, children, note, info, rungInfo }) {
     {note && <p className="note">{note}</p>}{children}</section>);
 }
 const SectionH = ({ children, src, info }) => <div className="section-h"><h3>{children}{info && <Info k={info}/>}</h3><div className="line"></div>{src && <span className="src">{src}</span>}</div>;
+
+const GROUP_TYPES = [["office","Office"],["provider","Provider"],["sex","Sex"],["race","Race"],["exam_year","Exam year"],["age_band","Age band"]];
+const GROUP_METRICS = [["no_margin_chart","No gum-margin readings"],["incomplete_chart","Incomplete in any way"]];
+function GroupPanel({ rows }) {
+  const [type, setType] = useState("office");
+  const [metric, setMetric] = useState("no_margin_chart");
+  const sel = rows.filter(r => r.group_type === type && r.metric === metric);
+  const label = r => type === "office" ? `Office ${r.group}` : type === "provider" ? `Provider ${r.group}` : r.group;
+  const flagged = sel.filter(r => r.is_flagged).length;
+  return (<Panel w="w12" eyebrow="Consistency by group · synthetic Open Dental extract" title="Is the perio chart kept as well for every group?" info="groups"
+      note={`Share of each group's perio charts. ${flagged ? flagged + " flagged ▲ against the rest of its type." : "No group is flagged: on synthetic data every group is charted alike, as the generator makes it."}`}>
+    <div className="clinics" role="group" aria-label="Group by" style={{ marginBottom: 8 }}><span className="lbl">Group by</span>
+      {GROUP_TYPES.map(([id, l]) => <button key={id} type="button" aria-pressed={type === id} onClick={() => setType(id)}>{l}</button>)}</div>
+    <div className="scope" role="group" aria-label="Measure" style={{ marginBottom: 12 }}>
+      {GROUP_METRICS.map(([id, l]) => <button key={id} aria-pressed={metric === id} onClick={() => setMetric(id)}>{l}</button>)}</div>
+    <HBars rows={sel.map(r => ({ k: `${label(r)} (${r.chart_count.toLocaleString()})`, v: r.pct, flag: r.is_flagged }))}/>
+  </Panel>);
+}
+function ChecksPanel({ rows }) {
+  const DOMAIN = { completeness: "Completeness", accuracy: "Accuracy", plan_copy: "Plan copies", list_in_use: "List in use", consistency: "Consistency" };
+  return (<Panel w="w12" eyebrow="After Kookal et al. 2024 · synthetic Open Dental extract" title="Extract checks" info="checks"
+      note="Found = rows, cells or offices the check found. Flagged when anything is found; the missing-value share is reported, not flagged.">
+    <div className="twrap"><table><thead><tr><th>Check</th><th className="num">Found</th><th>Status</th></tr></thead>
+      <tbody>{rows.map(r => <tr key={r.check}><td className="k"><span style={{ display:"block", fontSize:11, color:"var(--ink-3)", textTransform:"uppercase", letterSpacing:"0.06em" }}>{DOMAIN[r.domain] || r.domain}</span>{r.text}</td>
+        <td className="num" title={`${fmt(r.found_pct, 2)}% of ${r.checked_count.toLocaleString()} checked`}>{r.found_count.toLocaleString()}<span style={{ display:"block", fontSize:11, color:"var(--ink-3)" }}>of {r.checked_count.toLocaleString()}</span></td>
+        <td>{r.is_flagged == null ? <span className="pill" style={{ color:"var(--ink-3)", background:"var(--surface-2)", marginTop:0 }}>Reported</span>
+          : r.is_flagged ? <span className="pill warn" style={{ marginTop:0 }}>Found</span> : <span className="pill good" style={{ marginTop:0 }}>None found</span>}</td></tr>)}</tbody></table></div>
+  </Panel>);
+}
 
 function App({ d }) {
   const S = d.sections;
@@ -444,6 +475,8 @@ function App({ d }) {
       <SectionH src="Spec 029, the tooth-loss work">How messy the perio charts are</SectionH>
       <Panel w="w12" eyebrow="Synthetic Open Dental extract · 2,000 patients" title="Chart messiness, measured the way a real extract would be" info="messiness" note="Counts only. Real rates come from running the same profile on a real extract.">
         <HBars rows={S.open_dental.map(r => ({ k: r.label, v: r.pct }))}/></Panel>
+      {S.chart_by_group && <GroupPanel rows={S.chart_by_group}/>}
+      {S.extract_checks && <ChecksPanel rows={S.extract_checks}/>}
     </div>
     <p className="foot">Every number is computed from the project's committed synthetic data, by the same tables as its Databricks dashboard (<a href={CODE}>dq_site.py</a>; <a href={SRC}>data</a>). Status thresholds (completeness 80%/25%, accuracy 85%/70%, spread 10/20 points, implausible 5%/10%, missingness 30%, concordance 65%, 8-point clinic gap) are starting points to agree with a research team. Personal learning project, not affiliated with any employer or organization; the patients are synthetic. Hover any bar or cell for its value.</p>
     <a className="home" href="/" style={{ marginTop:16 }}><b>H</b>← Back to home</a>
