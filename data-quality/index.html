@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
   /* Layout concept: a monitoring console — one filter rail, five domain tiles, then one panel per
-     framework sub-domain (Zozus completeness/accuracy/consistency + Kahn temporal plausibility + Liaw reliability),
+     framework sub-domain (Zozus completeness/accuracy/consistency + Kahn temporal plausibility + de Vet reliability),
      each panel labeled with the framework rung it satisfies. Scanned, not read. */
   :root {
     --page: #f9f9f7;          /* page plane */
@@ -240,7 +240,7 @@ const GLOSS = {
   framework: { t: "NIH pragmatic-trials framework", d: <>A guide from the NIH Health Care Systems Research Collaboratory on whether data collected during everyday care is good enough for research. It checks three things: is the data there (completeness), is it right (accuracy), and is it recorded the same way everywhere (consistency).</>, c: ZOZUS },
   zozus: { t: "Zozus", d: <>The surname of the first author, Meredith Zozus, of the NIH guide this page follows. Tiles marked “Zozus” are its three checks: completeness, accuracy and consistency.</>, c: ZOZUS },
   kahn: { t: "Kahn", d: <>Michael Kahn led a group that agreed shared names for data-quality checks on health records. One of their checks is used here: <b style={{display:"inline"}}>temporal plausibility</b>, whether a record changes over time in a way that could really happen.</>, c: KAHN },
-  liaw: { t: "Liaw", d: <>Liaw et al. (2013) reviewed how data quality is defined for chronic-disease records; its most common dimensions are completeness, accuracy, correctness, consistency and timeliness. This page adds a reliability check: do independent reviewers reach the same answer on the same record?</>, c: <>Liaw ST et al. Int J Med Inform 2013;82(1):10–24 (<a href="https://pubmed.ncbi.nlm.nih.gov/23122633" target="_blank" rel="noopener">PubMed</a>)</> },
+  devet: { t: "de Vet", d: <>Henrica de Vet and colleagues set out the difference between two ideas. <b style={{display:"inline"}}>Agreement:</b> how close two readings of the same thing are. <b style={{display:"inline"}}>Reliability:</b> whether, despite that difference, the readings can still tell people apart. This page uses reliability for whether independent reviewers reach the same answer on the same record.</>, c: <>de Vet HCW, Terwee CB, Knol DL, Bouter LM. J Clin Epidemiol 2006;59(10):1033–1039 (<a href="https://doi.org/10.1016/j.jclinepi.2005.10.015" target="_blank" rel="noopener">doi</a>)</> },
   completeness: { t: "Completeness", d: <>Is the information there? Here: the share of visits that have all three of an exam form, a diagnosis code and a gum chart.</> },
   accuracy: { t: "Accuracy", d: <>Is the information right? Here: how often the record's answer matches the true status. On this synthetic data the truth is known because the generator made it; real records would need reviewers.</> },
   consistency: { t: "Consistency", d: <>Is it recorded the same way everywhere? Here: how far apart the clinics are on the share of patients with gum disease. A big gap can mean different patients, different habits or different charting, so it's a prompt to look, not proof of an error.</> },
@@ -383,7 +383,7 @@ function App({ d }) {
   return (<>
     <a className="home" href="/"><b>H</b>← Back to home</a>
     <header className="top"><div><h1>Perio Data Quality (DQ) Monitor</h1>
-      <div className="sub">Is a dental record fit for finding gum disease? NIH pragmatic-trials framework<Info k="framework"/> (Zozus<Info k="zozus"/>) with Kahn<Info k="kahn"/> and Liaw<Info k="liaw"/> extensions</div></div>
+      <div className="sub">Is a dental record fit for finding gum disease? NIH pragmatic-trials framework<Info k="framework"/> (Zozus<Info k="zozus"/>) with Kahn<Info k="kahn"/> and de Vet<Info k="devet"/> extensions</div></div>
       <div className="meta"><span className="chip sample">Synthetic data · not clinical performance</span><span className="chip">{T.visit_count.toLocaleString()} visits</span><span className="chip">{T.clinic_count} clinics</span><span className="chip">Open Dental-shaped</span></div></header>
     <div className="rail" role="toolbar" aria-label="Filters">
       <div className="clinics" role="group" aria-label="Clinic"><span className="lbl">Clinic</span>
@@ -396,7 +396,7 @@ function App({ d }) {
       <Tile eyebrow="Zozus" src="zozus" info="accuracy" domain="Accuracy" v={m.accuracy_pct} unit="% vs truth" def="Rules on the whole record, measurements first, against the synthetic truth" status={band(m.accuracy_pct, 85, 70, true)}/>
       <Tile eyebrow="Zozus" src="zozus" info="consistency" domain="Consistency" v={T.consistency_pts} unit="pt spread" def={`Periodontitis prevalence range across the ${T.clinic_count} clinics`} status={band(T.consistency_pts, 10, 20, false)}/>
       <Tile eyebrow="Kahn" src="kahn" info="temporal" domain="Temporal plausibility" v={T.implausible_pct} unit="% implausible" def="Visit pairs whose stage improved without treatment" status={band(T.implausible_pct, 5, 10, false)}/>
-      <Tile eyebrow="Liaw" src="liaw" info="reliability" domain="Reliability" v={null} unit="" def="Needs real reviewers staging the same records" status="none"/>
+      <Tile eyebrow="de Vet" src="devet" info="reliability" domain="Reliability" v={null} unit="" def="Needs real reviewers staging the same records" status="none"/>
     </div>
     <div className="grid">
       <SectionH src={`${clinic === "All" ? "All clinics" : "Clinic " + clinic} · ${SCOPES.find(s => s.id === scope).label}`} info="completeness">Completeness</SectionH>
@@ -423,7 +423,7 @@ function App({ d }) {
       <Panel w="w4" eyebrow="Levels of scale" title="Prevalence by scale" info="scope" note="Periodontitis share on each scale, by method.">
         <div className="twrap"><table><thead><tr><th>Method</th><th>Scale</th><th className="num">Perio</th></tr></thead>
           <tbody>{S.prevalence_scale.filter(r => ["algorithm_design","notes","probing_chart"].includes(r.method)).map(r => <tr key={r.method + r.scale}><td className="k">{r.label}</td><td>{r.scale.replace(/_/g, " ")}</td><td className="num">{fmt(r.periodontitis_pct)}%</td></tr>)}</tbody></table></div></Panel>
-      <SectionH src="Borrowed from Kahn et al. · Liaw et al.">Concepts from other frameworks</SectionH>
+      <SectionH src="Borrowed from Kahn et al. · de Vet et al.">Concepts from other frameworks</SectionH>
       <Panel w="w6" eyebrow="Patient-level consistency · temporal plausibility" title="Stage at one visit and the next" rung="Kahn · temporal" rungInfo="temporal"
              note="Rules, exam form first. Without treatment a stage should hold or worsen; movement below the diagonal is implausible.">
         <TransitionMatrix stages={stages} value={trans}/>
@@ -431,7 +431,7 @@ function App({ d }) {
       <Panel w="w6" eyebrow="Temporal plausibility by method" title="Implausible change, per source" rung="Kahn · temporal" note="Visit pairs 1–2 years apart with no treatment between. Lower improved and resolved shares are more plausible.">
         <div className="twrap"><table><thead><tr><th>Method</th><th className="num">Pairs</th><th className="num">Improved</th><th className="num">Resolved</th><th className="num">Stage drop</th></tr></thead>
           <tbody>{S.temporal.map(r => <tr key={r.method}><td className="k">{r.label}</td><td className="num">{r.pair_count.toLocaleString()}</td><td className="num">{fmt(r.improved_pct)}%</td><td className="num">{fmt(r.resolved_pct)}%</td><td className="num">{fmt(r.stage_drop_pct)}%</td></tr>)}</tbody></table></div></Panel>
-      <Panel w="w12" eyebrow="Reliability" title="Not assessed" rung="Liaw · reliability" rungInfo="reliability">
+      <Panel w="w12" eyebrow="Reliability" title="Not assessed" rung="de Vet · reliability" rungInfo="reliability">
         <p className="note">Reliability needs real reviewers staging the same records, and their agreement with each other (<a href="../scoring/">how scoring works</a>). Simulated reviewers are a dry run and aren't shown.</p></Panel>
       <SectionH src="Pragmatic-trials framework">Impact assessment</SectionH>
       <Panel w="w12" eyebrow="Rule-based cascade" title="The study design's source order vs. observed accuracy" rung="Impact assessment" rungInfo="impact"
