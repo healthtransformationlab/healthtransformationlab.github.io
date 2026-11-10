@@ -143,7 +143,7 @@ footer p{max-width:60em;margin-bottom:10px}
 <div class="hero">
       <span class="tag">A personal project</span>
       <h1>Better health starts with <span>accurate health information.</span></h1>
-      <p class="lead">Millions of people ask AI from OpenAI, Anthropic and Google about their health, and clinics run on what is written in the record. <b>PerioBench</b>, working today on synthetic records, measures how well gum disease can be found in dental records. <b>OralHealthBench</b>, planned and building on GlobalDentBench, will measure how accurate those AI answers are on oral health and getting care. Both are open, so what they find gets fixed and health outcomes improve.</p>
+      <p class="lead">Millions of people ask AI from OpenAI, Anthropic and Google about their health, and clinics run on what is written in the record. <b>PerioBench</b>, working today on synthetic records, measures how well gum disease can be found in dental records. <b>OralHealthBench</b>, planned and building on GlobalDentBench, will measure how accurate those AI answers are on oral health and getting care. Both are open, so anyone can check what they find and fix it.</p>
       <div class="stats">
         <div class="stat"><b>40M+</b><span>people a day ask one AI assistant about health</span><small>OpenAI, January 2026</small></div>
         <div class="stat"><b>81% → 22%</b><span>AI's score on dental exam questions vs. questions from published patient cases</span><small>12 models · GlobalDentBench, 2026</small></div>
@@ -192,12 +192,12 @@ footer p{max-width:60em;margin-bottom:10px}
       <p class="quote">Gum disease is in the dental record. It's hard to count.</p>
       <p>Gum disease (periodontitis) is written down at almost every dental visit, but in pieces: notes, forms, codes and measurements that often disagree. So it is often missed, hard to follow over time, and hard to link to diabetes care. PerioBench scores how well rules and AI find it in the whole record. It runs end to end on <b>synthetic</b> records:</p>
       <ul>
-        <li>the whole record, combined by rules that read the gum measurements first: <b>234 of 240</b> charts agree with the answer key (flattering: these are the rules that made the key);</li>
-        <li>the free-text note alone, read by a small trained model: <b>219 of 240</b>;</li>
-        <li>a bigger medical AI (MedGemma 1.5 4B) used as is: <b>185 of 240</b>.</li>
+        <li>the whole record, combined by rules that read the gum measurements first: <b>207 of 223</b> charts agree with the answer key (flattering: these are the rules that made the key);</li>
+        <li>the free-text note alone, read by the best trained model (ModernBERT-large with a rule for stage 4): <b>203 of 223</b>;</li>
+        <li>a bigger medical AI (MedGemma 4B) used as is: <b>178 of 223</b>.</li>
       </ul>
       <p class="note">Scored against the generator's answer key, which the project's own 2017 rules made from invented measurements: agreement with that key, not accuracy on real patients, and not clinical performance. <a href="scoring/">How scoring works</a>.</p>
-      <p class="note"><b>Order matters.</b> A record's gum measurements, exam form, codes and note often disagree, so the rules must pick which to believe first. Measurements first gives 234 of 240; the exam form first, as the original study design does, gives 173. Same records, a different answer, depending only on which piece is trusted first. <a href="standards/">Definitions and orders, side by side</a>.</p>
+      <p class="note"><b>Order matters.</b> A record's gum measurements, exam form, codes and note often disagree, so the rules must pick which to believe first. Measurements first gives 207 of 223; the exam form first, as the original study design does, gives 176. Same records, a different answer, depending only on which piece is trusted first. <a href="standards/">Definitions and orders, side by side</a>.</p>
       <div class="buttons">
         <a class="btn primary" href="perio-bench/" target="_blank" rel="noopener">View the pitch (12 slides)</a>
         <a class="btn" href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/docs/edr/full_text_and_notes.md" target="_blank" rel="noopener">Read with speaker notes</a>
