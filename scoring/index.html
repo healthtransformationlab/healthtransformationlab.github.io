@@ -51,12 +51,12 @@ th{font-weight:700}
 <main class="wrap">
   <section>
     <h2>Which records each number counts</h2>
-    <p>The synthetic data has 1,200 patients and 4,343 visits. Different results count different parts of it, so two numbers that look like they conflict usually count different records:</p>
+    <p>The synthetic study data has 3,794 visits of 1,119 patients. Different results count different parts of it, so two numbers that look like they conflict usually count different records:</p>
     <div class="scroll"><table>
       <tr><th>Set</th><th>Records</th><th>Used for</th></tr>
-      <tr><td><b>Review charts (test set)</b></td><td>240, one visit each from 240 held-out patients</td><td><b>Every method's score:</b> 234 vs 173, BERT, MedGemma, the leaderboard</td></tr>
-      <tr><td><b>Training notes</b></td><td>3,484 visits of the other 960 patients</td><td>Training the note-reading models</td></tr>
-      <tr><td><b>Charted visits</b></td><td>3,437 of all 4,343 visits, the ones with a gum chart</td><td>Comparing the definitions and how often the record's parts agree (<a href="../standards/">definitions and orders</a>)</td></tr>
+      <tr><td><b>Review charts (test set)</b></td><td>223, one visit each from 223 held-out patients</td><td><b>Every method's score:</b> 207 vs 176, BERT, MedGemma, the leaderboard</td></tr>
+      <tr><td><b>Training notes</b></td><td>3,016 visits of the other 896 patients</td><td>Training the note-reading models</td></tr>
+      <tr><td><b>Charted visits</b></td><td>2,990 of all 3,794 visits, the ones with a gum chart</td><td>Comparing the definitions and how often the record's parts agree (<a href="../standards/">definitions and orders</a>)</td></tr>
       <tr><td><b>Open Dental extract</b></td><td>a separate set of 2,000 patients</td><td>The tooth-loss model, one row per tooth</td></tr>
     </table></div>
     <p class="note">No patient is in both the training notes and the review charts, so a model never sees a held-out patient.</p>
@@ -66,10 +66,10 @@ th{font-weight:700}
     <p>PerioBench scores rules and AI that find gum disease in dental records. Each reads a record and answers with a status, from healthy to periodontitis stage 4, under the 2017 classification.</p>
     <p>On synthetic records, the generator first invents each patient's gum measurements. It then applies the project's own 2017 rules to those measurements to get the true status, and writes the chart, note, codes and X-ray reading from it, with mistakes added on purpose. That true status goes in an answer key no method sees.</p>
     <div class="card"><p><b>That answer key is right because we defined it, not because anyone checked it.</b> So a synthetic score shows how well a method recovers our rules through the noise we added. It is <b>agreement with the synthetic answer key</b>, not accuracy on real patients.</p></div>
-    <p>It is still useful: it shows the code works end to end, compares methods under the same known conditions, and shows how much worse each gets as records get messier. Two things make the gap to real records bigger, and the results now show both:</p>
+    <p>It is still useful: it shows the code works end to end, compares methods under the same known conditions, and shows how much worse each gets as records get messier. Two things make the gap to real records bigger or harder to see, and the results now show both:</p>
     <ul>
       <li><b>Some methods use the same rules that made the answer key</b>, so they start with an advantage real records won't give them. The leaderboard marks them with †.</li>
-      <li><b>Some records can't be staged.</b> Staging needs gum or bone measurements. 13 of the 240 test charts have no gum chart and no X-ray, and their notes state exactly the true status, so a method that copies the note looks right for free. Scores are now reported separately for records that can and can't be staged.</li>
+      <li><b>Some records can't be staged.</b> Staging needs gum or bone measurements. 17 of the 223 review charts have no gum chart and no X-ray reading. There, only the note, the exam form and the codes give a status, and no chart or X-ray reading is there to check it against. The note states the true status on 12 of the 17. Scored at five status groups, the keyword rules get 14 of the 17, about the same share as on the charts that can be staged (169 of 206). On a real record, a stated diagnosis without measurements can't be checked against anything. Scores are reported separately for records that can and can't be staged.</li>
     </ul>
   </section>
   <section>
