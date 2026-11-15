@@ -57,7 +57,7 @@ th{font-weight:700}
       <tr><td><b>Review charts (test set)</b></td><td>223, one visit each from 223 held-out patients</td><td><b>Every method's score:</b> 207 vs 176, BERT, MedGemma, the leaderboard</td></tr>
       <tr><td><b>Training notes</b></td><td>3,016 visits of the other 896 patients</td><td>Training the note-reading models</td></tr>
       <tr><td><b>Charted visits</b></td><td>2,990 of all 3,794 visits, the ones with a gum chart</td><td>Comparing the definitions and how often the record's parts agree (<a href="../standards/">definitions and orders</a>)</td></tr>
-      <tr><td><b>Open Dental extract</b></td><td>a separate set of 2,000 patients</td><td>The tooth-loss model, one row per tooth</td></tr>
+      <tr><td><b>Open Dental extract</b></td><td>a separate set: 2,000 patients on Databricks, 6,000 in the tooth-loss results, and a 200-patient sample in the repository</td><td>The tooth-loss model, one row per tooth</td></tr>
     </table></div>
     <p class="note">No patient is in both the training notes and the review charts, so a model never sees a held-out patient.</p>
   </section>
