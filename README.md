@@ -5,9 +5,11 @@ people ask and in dental records. Served by GitHub Pages at https://healthtransf
 
 - `index.html`: the landing page, from the
   [project README](https://github.com/healthtransformationlab/health-transformation-lab-nlp).
-- `perio-bench/`, `oral-health-bench/`: the two pitch decks, copied from `docs/edr/deck.html` and
-  `docs/pitch/deck.html` in that repo. Edit the slides there, rebuild with `python docs/build_decks.py`, and copy the
-  built `deck.html` here.
+- `perio-bench/`, `oral-health-bench/`, `access-bench/`: the three pitch decks, copied from `docs/edr/deck.html`,
+  `docs/pitch/deck.html` and `docs/access/deck.html` in that repo by its copy-decks-to-site workflow. Edit the slides
+  there and rebuild with `python docs/build_decks.py`; the workflow copies the built `deck.html` here on merge.
+- `img/`: the deck covers. `edr_deck_cover.png` and `pitch_deck_cover.png` are copied from that repo;
+  `access_deck_cover.png` is the AccessBench deck's first slide, rendered at 960 x 540.
 - `scoring/`: how PerioBench scores work, the short form of
   [docs/scoring.md](https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/docs/scoring.md)
   in that repo (spec 030). Edit both together.

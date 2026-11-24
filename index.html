@@ -39,7 +39,7 @@ html{scroll-padding-top:calc(var(--nav-h) + 8px)}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:700;font-size:17px;color:var(--paper);text-decoration:none;white-space:nowrap}
 .brand .mark{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--peach);color:var(--deep);font-size:16px}
 .topnav ul{list-style:none;display:flex;align-items:center;gap:6px;padding:0}
-.topnav ul a{display:block;color:var(--mist);text-decoration:none;font-size:15px;font-weight:600;padding:8px 12px;border-radius:8px;transition:color .2s,background .2s}
+.topnav ul a{display:block;white-space:nowrap;color:var(--mist);text-decoration:none;font-size:15px;font-weight:600;padding:8px 12px;border-radius:8px;transition:color .2s,background .2s}
 .topnav ul a:hover{color:var(--paper);background:rgba(255,255,255,.07)}
 .topnav ul a.active{color:var(--peach)}
 .topnav ul a.cta{background:var(--peach);color:var(--deep);margin-left:8px}
@@ -105,7 +105,8 @@ footer p{max-width:60em;margin-bottom:10px}
 .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
 .reveal.in{opacity:1;transform:none}
 
-@media (max-width:820px){
+/* the menu collapses to the button before its six links and GitHub would wrap (AccessBench added a seventh) */
+@media (max-width:1100px){
   .menu-btn{display:block}
   .topnav.open{background:var(--deep)}
   .topnav ul{position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:2px;box-shadow:0 12px 24px rgba(0,0,0,.25);
@@ -114,6 +115,8 @@ footer p{max-width:60em;margin-bottom:10px}
   .topnav.open ul{transform:none;opacity:1;visibility:visible}
   .topnav ul a{padding:12px}
   .topnav ul a.cta{margin:8px 0 0;text-align:center}
+}
+@media (max-width:820px){
   .bench{grid-template-columns:1fr;gap:28px}
   section{padding:56px 0}
   .hero{padding:48px 0 64px}
@@ -132,6 +135,7 @@ footer p{max-width:60em;margin-bottom:10px}
       <li><a href="#why">Why</a></li>
       <li><a href="#periobench">PerioBench</a></li>
       <li><a href="#oralhealthbench">OralHealthBench</a></li>
+      <li><a href="#accessbench">AccessBench</a></li>
       <li><a href="#how">How it works</a></li>
       <li><a class="cta" href="https://github.com/healthtransformationlab/health-transformation-lab-nlp" target="_blank" rel="noopener">GitHub ↗</a></li>
     </ul>
@@ -179,6 +183,7 @@ footer p{max-width:60em;margin-bottom:10px}
     <div class="why">
       <div class="card reveal"><h3>PerioBench: trustworthy records</h3><p>Measure the data quality of electronic dental records, so gum disease can be counted, followed over time and linked to diabetes care.</p></div>
       <div class="card reveal"><h3>OralHealthBench (planned): accurate AI answers</h3><p>Score the AI that millions of people ask on the questions that matter at the seam of medical and dental care: medicines, chronic disease, emergencies.</p></div>
+      <div class="card reveal"><h3>AccessBench (exploratory): getting care</h3><p>Whether an answer helps someone actually get care: coverage, cost, appeals, travel and accommodations, not only whether the facts are sound.</p></div>
       <div class="card reveal"><h3>Open and public</h3><p>Questions trace to published evidence, scores are public, and the code, the synthetic data and the methods are open for anyone to check.</p></div>
     </div>
   </div>
@@ -199,7 +204,7 @@ footer p{max-width:60em;margin-bottom:10px}
       <p class="note">Scored against the generator's answer key, which the project's own 2017 rules made from invented measurements: agreement with that key, not accuracy on real patients, and not clinical performance. <a href="scoring/">How scoring works</a>.</p>
       <p class="note"><b>Order matters.</b> A record's gum measurements, exam form, codes and note often disagree, so the rules must pick which to believe first. Measurements first gives 207 of 223; the exam form first, as the original study design does, gives 176. Same records, a different answer, depending only on which piece is trusted first. <a href="standards/">Definitions and orders, side by side</a>.</p>
       <div class="buttons">
-        <a class="btn primary" href="perio-bench/" target="_blank" rel="noopener">View the pitch (12 slides)</a>
+        <a class="btn primary" href="perio-bench/" target="_blank" rel="noopener">View the pitch</a>
         <a class="btn" href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/docs/edr/full_text_and_notes.md" target="_blank" rel="noopener">Read with speaker notes</a>
         <a class="btn" href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/docs/edr/README.md" target="_blank" rel="noopener">The study</a>
         <a class="btn" href="data-quality/">Data quality</a>
@@ -216,7 +221,6 @@ footer p{max-width:60em;margin-bottom:10px}
       <h2>OralHealthBench</h2>
       <p class="quote">AI passes the dental exam. It fails the real patient.</p>
       <p>Twelve leading AI models average 81% on dental licensing-exam questions but 22% on questions built from published patient cases (GlobalDentBench, 2026). Most benchmarks test exam knowledge, and studies of real patient cases have found the same gap: on real hospital cases, models didn't follow the clinical guidelines doctors use (<a href="https://doi.org/10.1038/s41591-024-03097-1" target="_blank" rel="noopener">Hager et al., 2024</a>); people using them did no better than people using a source of their choice (<a href="https://doi.org/10.1038/s41591-025-04074-y" target="_blank" rel="noopener">Bean et al., 2026</a>); and against a standard drug-interaction checker, ChatGPT-3.5 got 47% of 255 drug pairs right (<a href="https://doi.org/10.2147/DHPS.S425858" target="_blank" rel="noopener">Al-Ashwal et al., 2023</a>). OralHealthBench, planned and building on GlobalDentBench, will put real-world questions where dentistry meets medicine on a public scorecard, such as a medicine that makes a tooth extraction unsafe, each traced to published evidence, and will measure how much an open evidence agent improves the answers.</p>
-      <p style="margin-top:14px">A third idea, <b>AccessBench</b>, is exploratory: it would ask whether an answer works for someone with no coverage, no car or no dentist nearby.</p>
       <div class="buttons">
         <a class="btn primary" href="oral-health-bench/" target="_blank" rel="noopener">View the pitch</a>
         <a class="btn" href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/docs/pitch/full_text_and_notes.md" target="_blank" rel="noopener">Read with speaker notes</a>
@@ -227,9 +231,31 @@ footer p{max-width:60em;margin-bottom:10px}
   </div>
 </section>
 
-<section id="how" class="alt">
+<section id="accessbench" class="alt">
+  <div class="wrap bench reveal">
+    <div>
+      <p class="kicker">Benchmark 3 · getting care · exploratory</p>
+      <h2>AccessBench</h2>
+      <p class="quote">The answer can be right. Does it get you care?</p>
+      <p>An answer can be medically right and still not get someone care: it misses that adult Medicaid dental benefits differ by state and plan, that a denial can be appealed, or that a cleaning is not a gum evaluation. AccessBench scores whether the answer names the next concrete step for this person, and avoids the confident wrong turn. The first 15 questions are <b>synthetic</b>, written from real public questions:</p>
+      <ul>
+        <li>ten about getting a periodontal screening: Medicaid coverage by state, denials and appeals, waiting periods, and the Medicare dental exclusion;</li>
+        <li>five with planted fake names, phone numbers and IDs that a good answer must not repeat.</li>
+      </ul>
+      <p class="note">Each answer is scored on the key points it must include and the wrong advice it must avoid, by a second model, against published sources. No scores are published yet: the answer keys are reviewed first.</p>
+      <div class="buttons">
+        <a class="btn primary" href="access-bench/" target="_blank" rel="noopener">View the pitch</a>
+        <a class="btn" href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/docs/access/full_text_and_notes.md" target="_blank" rel="noopener">Read with speaker notes</a>
+        <a class="btn" href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/benchmarks/access_bench/README.md" target="_blank" rel="noopener">The questions</a>
+      </div>
+    </div>
+    <a href="access-bench/" target="_blank" rel="noopener"><img src="img/access_deck_cover.png" alt="AccessBench pitch cover: The answer can be right. Does it get you care?" width="960" height="540"></a>
+  </div>
+</section>
+
+<section id="how">
   <div class="wrap">
-    <p class="kicker">How the two connect</p>
+    <p class="kicker">How the three connect</p>
     <h2>One way to test AI, from gum charts to the questions people ask.</h2>
     <p>The dental record path builds synthetic patients whose right answers are known, in OMOP, the data format medicine already uses. Those patients become test questions for OralHealthBench. AI is tested the same way at every step, with the same models, harm grades and leaderboards.</p>
     <div class="flow">
