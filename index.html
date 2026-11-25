@@ -82,6 +82,9 @@ section p{max-width:46em}
 .bench .quote{font-family:var(--serif);font-size:20px;color:var(--accent);margin:4px 0 16px}
 .bench ul{padding-left:20px;margin:16px 0}
 .bench li{margin:6px 0}
+.sections{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:6px}
+.sections li{font-size:16px}
+.sections .soon{color:var(--muted)}
 .note{font-size:14px;color:var(--muted);border-left:3px solid var(--peach);padding-left:12px;margin-top:14px}
 .buttons{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
 .btn{display:inline-block;text-decoration:none;font-weight:700;font-size:15px;border-radius:10px;padding:12px 18px;border:1.5px solid var(--ink);color:var(--ink)}
@@ -183,7 +186,7 @@ footer p{max-width:60em;margin-bottom:10px}
     <div class="why">
       <div class="card reveal"><h3>PerioBench: trustworthy records</h3><p>Measure the data quality of electronic dental records, so gum disease can be counted, followed over time and linked to diabetes care.</p></div>
       <div class="card reveal"><h3>OralHealthBench (planned): accurate AI answers</h3><p>Score the AI that millions of people ask on the questions that matter at the seam of medical and dental care: medicines, chronic disease, emergencies.</p></div>
-      <div class="card reveal"><h3>AccessBench (exploratory): getting care</h3><p>Millions ask AI how to get and pay for care. Whether the answer gives the next step they need: coverage, cost, appeals, travel and accommodations.</p></div>
+      <div class="card reveal"><h3>AccessBench (exploratory): getting care</h3><p>Millions ask AI how to get and pay for care. Whether the answer gives the next step they need. Oral health first; medical care and mental health coming soon.</p></div>
       <div class="card reveal"><h3>Open and public</h3><p>Questions trace to published evidence, scores are public, and the code, the synthetic data and the methods are open for anyone to check.</p></div>
     </div>
   </div>
@@ -236,18 +239,23 @@ footer p{max-width:60em;margin-bottom:10px}
     <div>
       <p class="kicker">Benchmark 3 · getting care · exploratory</p>
       <h2>AccessBench</h2>
+      <ul class="sections">
+        <li><b>AccessBench: Oral Health</b> · first results below</li>
+        <li class="soon"><b>AccessBench: Medical Care</b> · coming soon</li>
+        <li class="soon"><b>AccessBench: Mental Health</b> · coming soon</li>
+      </ul>
       <p class="quote">Millions ask AI how to get care. Does the answer get them there?</p>
       <p>People now ask AI the questions they used to bring to a benefits counselor or a dental office's front desk: is this covered, what do I do about this bill, where can I go that I can afford. OpenAI reports more than 40 million people a day asking ChatGPT health questions, and 1.6 to 1.9 million health-insurance messages a week. The right answer depends on the state, the plan, the person's age and a deadline, and an answer that leaves out one step can mean an emergency visit, a cash bill or giving up.</p>
       <p>AccessBench grades whether an AI answer would let someone take the next step: the points this person needs, a usable first action, and no confident wrong turn, with harm and privacy graded separately. The 22 questions are <b>synthetic</b>, written from real public questions, and their answer keys were revised after reviews by five other AI models.</p>
-      <p><b>First results</b> (four open models, run 608662392694095): the answers gave <b>187 of 352</b> steps people needed. No model told someone with swelling or fever to get urgent care now, and none noticed that Medicaid's under-21 dental rule no longer applies at 23.</p>
+      <p><b>First results, AccessBench: Oral Health</b> (four open models, run 608662392694095): the answers gave <b>187 of 352</b> steps people needed. No model told someone with swelling or fever to get urgent care now, and none noticed that Medicaid's under-21 dental rule no longer applies at 23.</p>
       <p class="note">Preliminary: graded by one AI judge, not yet checked by an independent reviewer. ChatGPT, Claude and Gemini are next.</p>
       <div class="buttons">
-        <a class="btn primary" href="access-bench/" target="_blank" rel="noopener">View the pitch</a>
+        <a class="btn primary" href="access-bench/" target="_blank" rel="noopener">View the Oral Health pitch</a>
         <a class="btn" href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/docs/access/full_text_and_notes.md" target="_blank" rel="noopener">Read with speaker notes</a>
         <a class="btn" href="https://github.com/healthtransformationlab/health-transformation-lab-nlp/blob/main/benchmarks/access_bench/README.md" target="_blank" rel="noopener">The questions</a>
       </div>
     </div>
-    <a href="access-bench/" target="_blank" rel="noopener"><img src="img/access_deck_cover.png" alt="AccessBench pitch cover: Millions ask AI how to get care. Does the answer get them there?" width="960" height="540"></a>
+    <a href="access-bench/" target="_blank" rel="noopener"><img src="img/access_deck_cover.png" alt="AccessBench: Oral Health pitch cover: Millions ask AI how to get care. Does the answer get them there?" width="960" height="540"></a>
   </div>
 </section>
 
